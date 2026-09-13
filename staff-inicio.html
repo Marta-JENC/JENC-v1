@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Staff — JENC</title>
+<style>
+  :root {
+    --bg: #0F1B2B;
+    --card: #16263D;
+    --accent: #FF7A45;
+    --text: #F2F4F7;
+    --muted: #8FA0B8;
+    --border: #23374F;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 24px 16px 90px;
+    max-width: 480px;
+    margin-inline: auto;
+  }
+  header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 22px; }
+  header h1 { font-size: 22px; font-weight: 600; margin: 0 0 4px; }
+  header p { margin: 0; color: var(--muted); font-size: 14px; }
+  button.sair {
+    background:none; border:1px solid var(--border); color:var(--muted);
+    font-size:12px; padding:6px 10px; border-radius:8px; cursor:pointer;
+  }
+
+  .cartao-resumo {
+    background: linear-gradient(135deg, var(--accent), #FF9466);
+    border-radius: 16px;
+    padding: 20px;
+    color: #201007;
+    margin-bottom: 26px;
+  }
+  .cartao-resumo .tag { font-size: 12px; font-weight: 600; opacity: 0.75; }
+  .cartao-resumo .numero { font-size: 28px; font-weight: 800; margin: 4px 0 2px; }
+  .cartao-resumo .legenda { font-size: 13px; opacity: 0.85; }
+
+  .grid-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .card-nav {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 16px;
+    text-decoration: none;
+    color: var(--text);
+    display: block;
+  }
+  .card-nav .icone { font-size: 24px; margin-bottom: 10px; display: block; }
+  .card-nav .titulo { font-size: 14px; font-weight: 700; margin-bottom: 3px; }
+  .card-nav .descricao { font-size: 12px; color: var(--muted); line-height: 1.4; }
+
+  .estado { text-align: center; color: var(--muted); padding: 40px 0; font-size: 14px; }
+</style>
+</head>
+<body>
+
+  <header>
+    <div>
+      <h1 id="saudacao">Olá 👋</h1>
+      <p id="subtitulo">A carregar…</p>
+    </div>
+    <button class="sair" onclick="terminarSessaoStaff()">Sair</button>
+  </header>
+
+  <div id="conteudo" style="display:none;">
+
+    <div class="cartao-resumo">
+      <div class="tag">CHECK-INS NO EVENTO</div>
+      <div class="numero" id="resumo-numero">—</div>
+      <div class="legenda" id="resumo-legenda">a carregar…</div>
+    </div>
+
+    <div class="grid-nav">
+      <a href="staff-checkin.html" class="card-nav">
+        <span class="icone">✓</span>
+        <div class="titulo">Check-in</div>
+        <div class="descricao">Ler o QR de um participante e registar entrada/saída.</div>
+      </a>
+      <a href="staff-atividades.html" class="card-nav">
+        <span class="icone">🗓️</span>
+        <div class="titulo">Atividades</div>
+        <div class="descricao">Consultar o programa, salas e capacidades.</div>
+      </a>
+      <a href="staff-horario.html" class="card-nav">
+        <span class="icone">🕓</span>
+        <div class="titulo">O Meu Horário</div>
+        <div class="descricao">Onde tens de estar, e a que horas.</div>
+      </a>
+      <a href="staff-equipa.html" class="card-nav">
+        <span class="icone">👥</span>
+        <div class="titulo">Equipa</div>
+        <div class="descricao">Contactos de toda a equipa de staff.</div>
+      </a>
+    </div>
+
+  </div>
+
+  <div class="estado" id="carregamento">A carregar…</div>
+
+  <!-- 1. Biblioteca do Supabase como script normal (não é módulo) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- 2. O teu cliente Supabase -->
+  <script src="supabaseClient.js"></script>
+
+  <script>
+    init();
+
+    async function init() {
+      const user = await exigirSessaoStaff();
+      if (!user) return;
+
+      const staff = await getStaffAtual(user);
+      if (!staff) {
+        document.getElementById('carregamento').textContent = 'Conta sem acesso de staff.';
+        return;
+      }
+
+      renderSaudacao(staff);
+      await renderResumoCheckins();
+
+      document.getElementById('carregamento').style.display = 'none';
+      document.getElementById('conteudo').style.display = 'block';
+    }
+
+    function renderSaudacao(staff) {
+      const hora = new Date().getHours();
+      const cumprimento = hora < 12 ? 'Bom dia' : hora < 20 ? 'Boa tarde' : 'Boa noite';
+      document.getElementById('saudacao').textContent = `${cumprimento}, ${staff.nome ?? 'staff'} 👋`;
+      document.getElementById('subtitulo').textContent = staff.funcao ? `Função: ${staff.funcao}` : 'Área de staff JENC.';
+    }
+
+    async function renderResumoCheckins() {
+      const { count: totalParticipantes, error: erroTotal } = await supabaseClient
+        .from('participantes')
+        .select('id', { count: 'exact', head: true });
+
+      const { data: entradas, error: erroEntradas } = await supabaseClient
+        .from('checkins')
+        .select('participante_id')
+        .eq('tipo', 'evento')
+        .eq('acao', 'entrada');
+
+      if (erroTotal || erroEntradas) {
+        console.error('Erro ao ir buscar resumo de check-ins:', erroTotal || erroEntradas);
+        document.getElementById('resumo-legenda').textContent = 'Não foi possível carregar o resumo.';
+        return;
+      }
+
+      const distintos = new Set((entradas ?? []).map(e => e.participante_id)).size;
+
+      document.getElementById('resumo-numero').textContent = `${distintos} / ${totalParticipantes ?? '—'}`;
+      document.getElementById('resumo-legenda').textContent = 'participantes já fizeram check-in ao evento';
+    }
+
+    async function terminarSessaoStaff() {
+      await supabaseClient.auth.signOut();
+      window.location.href = 'login.html';
+    }
+  </script>
+
+</body>
+</html>

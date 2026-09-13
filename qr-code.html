@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>O meu QR Code — JENC</title>
+<style>
+  :root {
+    --bg: #0F1B2B;
+    --card: #16263D;
+    --accent: #FF7A45;
+    --text: #F2F4F7;
+    --muted: #8FA0B8;
+    --border: #23374F;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 20px 16px 90px;
+    max-width: 480px;
+    margin-inline: auto;
+  }
+  .voltar {
+    display: inline-block;
+    color: var(--muted);
+    font-size: 13px;
+    text-decoration: none;
+    margin-bottom: 14px;
+  }
+  h1 { font-size: 22px; margin: 0 0 20px; }
+
+  .cartao-qr {
+    background: #FFFFFF;
+    border-radius: 20px;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  #qr-canvas-container { line-height: 0; }
+  .codigo-texto {
+    margin-top: 14px;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #0F1B2B;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+  .card .rotulo { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .card .valor { font-size: 14px; font-weight: 500; }
+
+  .nota {
+    font-size: 12px;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 16px;
+    line-height: 1.5;
+  }
+
+  .estado { text-align: center; color: var(--muted); padding: 40px 0; font-size: 14px; }
+</style>
+</head>
+<body>
+
+  <a class="voltar" href="inicio.html">← Início</a>
+  <h1>O meu QR Code</h1>
+
+  <div id="conteudo" style="display:none;">
+    <div class="cartao-qr">
+      <div id="qr-canvas-container"></div>
+      <div class="codigo-texto" id="codigo-texto">—</div>
+    </div>
+
+    <div class="card">
+      <div class="rotulo">Nome</div>
+      <div class="valor" id="valor-nome">—</div>
+    </div>
+    <div class="card">
+      <div class="rotulo">Júnior Empresa</div>
+      <div class="valor" id="valor-junior-empresa">—</div>
+    </div>
+    <div class="card">
+      <div class="rotulo">Universidade</div>
+      <div class="valor" id="valor-universidade">—</div>
+    </div>
+
+    <p class="nota">
+      Este código identifica-te perante a equipa JENC. Mostra-o para fazeres check-in,
+      identificares-te nas refeições, ou se precisares de ajuda — a equipa consegue
+      ver o teu programa, alojamento e restrições alimentares assim que o lerem.
+    </p>
+  </div>
+
+  <div class="estado" id="carregamento">A carregar…</div>
+
+  <!-- 1. Biblioteca do Supabase como script normal (não é módulo) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- 2. O teu cliente Supabase -->
+  <script src="supabaseClient.js"></script>
+  <!-- 3. Biblioteca para desenhar o QR Code (script normal, sem módulos) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <script>
+    init();
+
+    async function init() {
+      const user = await exigirSessao();
+      if (!user) return;
+
+      const participante = await getParticipanteAtual(user);
+      if (!participante) {
+        document.getElementById('carregamento').textContent =
+          'Não foi possível carregar os teus dados. Contacta a organização.';
+        return;
+      }
+
+      if (!participante.qr_code) {
+        document.getElementById('carregamento').textContent =
+          'Ainda não tens um código atribuído. Contacta a organização.';
+        return;
+      }
+
+      render(participante);
+      await desenharQrCode(participante.qr_code);
+
+      document.getElementById('carregamento').style.display = 'none';
+      document.getElementById('conteudo').style.display = 'block';
+    }
+
+    function render(p) {
+      document.getElementById('codigo-texto').textContent = p.qr_code;
+      document.getElementById('valor-nome').textContent = p.nome ?? '—';
+      document.getElementById('valor-junior-empresa').textContent = p.junior_empresa ?? '—';
+      document.getElementById('valor-universidade').textContent = p.universidade ?? '—';
+    }
+
+    function desenharQrCode(codigo) {
+      const container = document.getElementById('qr-canvas-container');
+      container.innerHTML = '';
+
+      // O QR Code guarda só o código curto (ex: "JENC-001").
+      // O staff, ao ler, vai buscar tudo o resto ao Supabase em tempo real.
+      new QRCode(container, {
+        text: codigo,
+        width: 220,
+        height: 220,
+        colorDark: '#0F1B2B',
+        colorLight: '#FFFFFF'
+      });
+    }
+  </script>
+
+</body>
+</html>

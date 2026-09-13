@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gamificação — JENC</title>
+<style>
+  :root {
+    --bg: #0F1B2B;
+    --card: #16263D;
+    --accent: #FF7A45;
+    --text: #F2F4F7;
+    --muted: #8FA0B8;
+    --border: #23374F;
+    --sucesso: #7CD992;
+    --erro: #FF6B6B;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 20px 16px 90px;
+    max-width: 480px;
+    margin-inline: auto;
+  }
+  .voltar {
+    display: inline-block;
+    color: var(--muted);
+    font-size: 13px;
+    text-decoration: none;
+    margin-bottom: 14px;
+  }
+  h1 { font-size: 22px; margin: 0 0 18px; }
+
+  .cartao-pontos {
+    background: linear-gradient(135deg, var(--accent), #FF9466);
+    border-radius: 16px;
+    padding: 20px;
+    color: #201007;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .cartao-pontos .tag { font-size: 12px; font-weight: 600; opacity: 0.75; }
+  .cartao-pontos .numero { font-size: 30px; font-weight: 800; margin-top: 2px; }
+  .cartao-pontos .posicao { text-align: right; font-size: 13px; font-weight: 700; }
+
+  .abas-secao {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+  .aba-secao {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    border-radius: 10px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .aba-secao.ativa { background: var(--accent); color: #201007; border-color: var(--accent); }
+
+  .secao { display: none; }
+  .secao.ativa { display: block; }
+
+  .card-desafio {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  .card-desafio.em-breve { opacity: 0.6; }
+  .cabecalho-desafio { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 6px; }
+  .cabecalho-desafio .nome { font-size: 15px; font-weight: 700; }
+  .badge-pontos {
+    flex-shrink: 0;
+    font-size: 11px; font-weight: 700;
+    background: #FF7A4520; color: var(--accent);
+    padding: 3px 9px; border-radius: 999px;
+    white-space: nowrap;
+  }
+  .badge-embreve {
+    flex-shrink: 0;
+    font-size: 11px; font-weight: 700;
+    background: var(--border); color: var(--muted);
+    padding: 3px 9px; border-radius: 999px;
+    white-space: nowrap;
+  }
+  .descricao-desafio { font-size: 13px; color: var(--muted); line-height: 1.5; margin-bottom: 12px; }
+
+  .estado-desafio {
+    font-size: 13px; font-weight: 700; padding: 8px 0;
+  }
+  .estado-desafio.aprovado { color: var(--sucesso); }
+
+  .form-submissao input[type="text"] {
+    width: 100%; padding: 10px 12px; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--bg); color: var(--text);
+    font-size: 13px; margin-bottom: 8px;
+  }
+  .form-submissao input[type="file"] {
+    width: 100%; font-size: 12px; color: var(--muted); margin-bottom: 10px;
+  }
+  .botao-submeter {
+    width: 100%; padding: 11px; border: none; border-radius: 8px;
+    background: var(--accent); color: #201007; font-weight: 700; font-size: 13px; cursor: pointer;
+  }
+  .botao-submeter:disabled { opacity: 0.6; cursor: default; }
+
+  .miniatura-enviada {
+    width: 100%; max-height: 220px; object-fit: cover;
+    border-radius: 10px; margin-bottom: 8px;
+  }
+
+  .mensagem-desafio { font-size: 12px; margin-top: 8px; min-height: 16px; }
+  .mensagem-desafio.erro { color: var(--erro); }
+  .mensagem-desafio.sucesso { color: var(--sucesso); }
+
+  .grid-mural {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .item-mural {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .item-mural img { width: 100%; height: 130px; object-fit: cover; display: block; }
+  .item-mural .legenda-mural { padding: 8px 10px; font-size: 11px; }
+  .item-mural .legenda-mural .nome { font-weight: 700; }
+  .item-mural .legenda-mural .texto { color: var(--muted); margin-top: 2px; }
+
+  .linha-leaderboard {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 8px;
+  }
+  .linha-leaderboard.eu { border-color: var(--accent); background: #FF7A4515; }
+  .linha-leaderboard .posicao-num {
+    width: 26px; text-align: center; font-weight: 800; color: var(--muted); font-size: 14px;
+  }
+  .linha-leaderboard.top1 .posicao-num,
+  .linha-leaderboard.top2 .posicao-num,
+  .linha-leaderboard.top3 .posicao-num { color: var(--accent); }
+  .linha-leaderboard .info-lb { flex: 1; }
+  .linha-leaderboard .nome-lb { font-size: 13px; font-weight: 600; }
+  .linha-leaderboard .junior-lb { font-size: 11px; color: var(--muted); }
+  .linha-leaderboard .pontos-lb { font-size: 14px; font-weight: 800; color: var(--accent); }
+
+  .estado, .vazio { text-align: center; color: var(--muted); padding: 30px 0; font-size: 14px; }
+</style>
+</head>
+<body>
+
+  <a class="voltar" href="inicio.html">← Início</a>
+  <h1>Gamificação</h1>
+
+  <div id="conteudo" style="display:none;">
+
+    <div class="cartao-pontos">
+      <div>
+        <div class="tag">OS TEUS PONTOS</div>
+        <div class="numero" id="total-pontos">0</div>
+      </div>
+      <div class="posicao" id="posicao-leaderboard">—</div>
+    </div>
+
+    <div class="abas-secao">
+      <div class="aba-secao ativa" data-secao="desafios">Desafios</div>
+      <div class="aba-secao" data-secao="mural">Mural</div>
+      <div class="aba-secao" data-secao="leaderboard">Leaderboard</div>
+    </div>
+
+    <div class="secao ativa" id="secao-desafios"></div>
+
+    <div class="secao" id="secao-mural">
+      <div id="grid-mural" class="grid-mural"></div>
+      <div class="vazio" id="mural-vazio" style="display:none;">Ainda não há fotos no mural. Sê o primeiro a partilhar!</div>
+    </div>
+
+    <div class="secao" id="secao-leaderboard"></div>
+
+  </div>
+
+  <div class="estado" id="carregamento">A carregar…</div>
+
+  <!-- 1. Biblioteca do Supabase como script normal (não é módulo) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- 2. O teu cliente Supabase -->
+  <script src="supabaseClient.js"></script>
+
+  <script>
+    let participanteAtual = null;
+    let desafios = [];
+    let minhasParticipacoes = {}; // { desafio_id: linha_da_gamification }
+
+    init();
+
+    document.querySelectorAll('.aba-secao').forEach(aba => {
+      aba.addEventListener('click', () => {
+        document.querySelectorAll('.aba-secao').forEach(a => a.classList.remove('ativa'));
+        document.querySelectorAll('.secao').forEach(s => s.classList.remove('ativa'));
+        aba.classList.add('ativa');
+        document.getElementById('secao-' + aba.dataset.secao).classList.add('ativa');
+
+        if (aba.dataset.secao === 'mural') carregarMural();
+        if (aba.dataset.secao === 'leaderboard') carregarLeaderboard();
+      });
+    });
+
+    async function init() {
+      const user = await exigirSessao();
+      if (!user) return;
+
+      participanteAtual = await getParticipanteAtual(user);
+      if (!participanteAtual) {
+        document.getElementById('carregamento').textContent =
+          'Não foi possível carregar os teus dados. Contacta a organização.';
+        return;
+      }
+
+      desafios = await getDesafios();
+      await carregarMinhasParticipacoes();
+      await carregarContagemContactos();
+      renderDesafios();
+      await carregarPontosEPosicao();
+
+      document.getElementById('carregamento').style.display = 'none';
+      document.getElementById('conteudo').style.display = 'block';
+    }
+
+    async function getDesafios() {
+      const { data, error } = await supabaseClient
+        .from('desafios')
+        .select('id, nome, descricao, pontos, tipo')
+        .eq('ativo', true);
+
+      if (error) {
+        console.error('Erro ao ir buscar desafios:', error.message, error.details, error.hint);
+        return [];
+      }
+      return data ?? [];
+    }
+
+    let contagemContactos = 0;
+
+    async function carregarContagemContactos() {
+      const { data, error } = await supabaseClient.rpc('meus_contactos');
+      if (error) {
+        console.error('Erro ao ir buscar contagem de contactos:', error.message, error.details, error.hint);
+        return;
+      }
+      contagemContactos = data?.length ?? 0;
+    }
+
+    async function carregarMinhasParticipacoes() {
+      const { data, error } = await supabaseClient
+        .from('gamification')
+        .select('id, desafio_id, pontos, estado, imagem_url, legenda')
+        .eq('participante_id', participanteAtual.id);
+
+      if (error) {
+        console.error('Erro ao ir buscar as tuas participações:', error.message, error.details, error.hint);
+        return;
+      }
+
+      minhasParticipacoes = {};
+      (data ?? []).forEach(linha => { minhasParticipacoes[linha.desafio_id] = linha; });
+    }
+
+    async function carregarPontosEPosicao() {
+      const { data, error } = await supabaseClient.rpc('leaderboard');
+      if (error) {
+        console.error('Erro ao ir buscar o leaderboard:', error.message, error.details, error.hint);
+        return;
+      }
+
+      const indice = data.findIndex(l => l.participante_id === participanteAtual.id);
+      const meuTotal = indice >= 0 ? data[indice].total_pontos : 0;
+
+      document.getElementById('total-pontos').textContent = meuTotal;
+      document.getElementById('posicao-leaderboard').textContent =
+        indice >= 0 ? `#${indice + 1} de ${data.length}` : '—';
+    }
+
+    function renderDesafios() {
+      const container = document.getElementById('secao-desafios');
+      container.innerHTML = '';
+
+      if (desafios.length === 0) {
+        container.innerHTML = '<div class="vazio">Ainda não há desafios publicados.</div>';
+        return;
+      }
+
+      desafios.forEach(d => {
+        const minhaParticipacao = minhasParticipacoes[d.id];
+        const card = document.createElement('div');
+        card.className = 'card-desafio' + (d.tipo === 'em_breve' ? ' em-breve' : '');
+
+        let corpoInterno = '';
+
+        if (d.tipo === 'em_breve') {
+          corpoInterno = `<div class="badge-embreve" style="display:inline-block; margin-top:4px;">🔒 Em breve</div>`;
+        } else if (d.tipo === 'contactos') {
+          if (minhaParticipacao && minhaParticipacao.estado === 'aprovado') {
+            corpoInterno = `<div class="estado-desafio aprovado">✓ Desafio completo — +${minhaParticipacao.pontos} pontos</div>`;
+          } else {
+            corpoInterno = `
+              <div style="font-size:13px; color:var(--muted); margin-bottom:10px;">Progresso: ${Math.min(contagemContactos,5)} / 5 contactos</div>
+              <a href="contactos.html" class="botao-submeter" style="display:block; text-decoration:none; text-align:center;">Ir adicionar contactos →</a>
+            `;
+          }
+        } else if (d.tipo === 'foto') {
+          if (minhaParticipacao && minhaParticipacao.estado === 'aprovado') {
+            corpoInterno = `
+              <img class="miniatura-enviada" src="${minhaParticipacao.imagem_url}" alt="A tua foto">
+              <div class="estado-desafio aprovado">✓ Publicado no mural — +${minhaParticipacao.pontos} pontos</div>
+            `;
+          } else {
+            corpoInterno = `
+              <div class="form-submissao">
+                <input type="text" id="legenda-${d.id}" placeholder="Legenda (opcional)">
+                <input type="file" id="foto-${d.id}" accept="image/*">
+                <button class="botao-submeter" id="botao-${d.id}" onclick="submeterFoto('${d.id}')">Publicar no mural (+${d.pontos} pontos)</button>
+                <div class="mensagem-desafio" id="mensagem-${d.id}"></div>
+              </div>
+            `;
+          }
+        }
+
+        card.innerHTML = `
+          <div class="cabecalho-desafio">
+            <div class="nome">${d.nome}</div>
+            ${d.tipo !== 'em_breve' ? `<div class="badge-pontos">${d.pontos} pts</div>` : ''}
+          </div>
+          <div class="descricao-desafio">${d.descricao ?? ''}</div>
+          ${corpoInterno}
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    async function submeterFoto(desafioId) {
+      const inputFoto = document.getElementById(`foto-${desafioId}`);
+      const inputLegenda = document.getElementById(`legenda-${desafioId}`);
+      const mensagemEl = document.getElementById(`mensagem-${desafioId}`);
+      const botao = document.getElementById(`botao-${desafioId}`);
+
+      const ficheiro = inputFoto.files[0];
+      if (!ficheiro) {
+        mensagemEl.textContent = 'Escolhe uma foto primeiro.';
+        mensagemEl.className = 'mensagem-desafio erro';
+        return;
+      }
+
+      mensagemEl.textContent = 'A enviar…';
+      mensagemEl.className = 'mensagem-desafio';
+      if (botao) botao.disabled = true;
+
+      const extensao = ficheiro.name.split('.').pop();
+      const caminho = `${participanteAtual.id}-${desafioId}-${Date.now()}.${extensao}`;
+
+      const { error: erroUpload } = await supabaseClient
+        .storage
+        .from('mural')
+        .upload(caminho, ficheiro, { upsert: true });
+
+      if (erroUpload) {
+        mensagemEl.textContent = 'Erro ao enviar a foto: ' + erroUpload.message;
+        mensagemEl.className = 'mensagem-desafio erro';
+        if (botao) botao.disabled = false;
+        return;
+      }
+
+      const { data: urlPublica } = supabaseClient.storage.from('mural').getPublicUrl(caminho);
+      const desafio = desafios.find(d => d.id === desafioId);
+
+      const { error: erroInsert } = await supabaseClient.from('gamification').insert({
+        participante_id: participanteAtual.id,
+        desafio_id: desafioId,
+        desafio: desafio?.nome ?? null,
+        pontos: desafio?.pontos ?? 0,
+        estado: 'aprovado',
+        imagem_url: urlPublica.publicUrl,
+        legenda: inputLegenda.value.trim() || null,
+        prova_submetida: urlPublica.publicUrl
+      });
+
+      if (erroInsert) {
+        mensagemEl.textContent = 'Erro ao guardar: ' + erroInsert.message;
+        mensagemEl.className = 'mensagem-desafio erro';
+        if (botao) botao.disabled = false;
+        return;
+      }
+
+      await carregarMinhasParticipacoes();
+      renderDesafios();
+      await carregarPontosEPosicao();
+    }
+
+    async function carregarMural() {
+      const grid = document.getElementById('grid-mural');
+      const vazio = document.getElementById('mural-vazio');
+      grid.innerHTML = '<div class="vazio">A carregar mural…</div>';
+
+      const { data, error } = await supabaseClient.rpc('mural_fotos');
+      if (error) {
+        grid.innerHTML = '';
+        vazio.style.display = 'block';
+        vazio.textContent = 'Não foi possível carregar o mural.';
+        console.error('Erro ao ir buscar o mural:', error.message, error.details, error.hint);
+        return;
+      }
+
+      grid.innerHTML = '';
+      if (!data || data.length === 0) {
+        vazio.style.display = 'block';
+        return;
+      }
+      vazio.style.display = 'none';
+
+      data.forEach(foto => {
+        const item = document.createElement('div');
+        item.className = 'item-mural';
+        item.innerHTML = `
+          <img src="${foto.imagem_url}" alt="Foto de ${foto.nome}">
+          <div class="legenda-mural">
+            <div class="nome">${foto.nome}</div>
+            ${foto.legenda ? `<div class="texto">${foto.legenda}</div>` : ''}
+          </div>
+        `;
+        grid.appendChild(item);
+      });
+    }
+
+    async function carregarLeaderboard() {
+      const container = document.getElementById('secao-leaderboard');
+      container.innerHTML = '<div class="vazio">A carregar leaderboard…</div>';
+
+      const { data, error } = await supabaseClient.rpc('leaderboard');
+      if (error) {
+        container.innerHTML = '<div class="vazio">Não foi possível carregar o leaderboard.</div>';
+        console.error('Erro ao ir buscar o leaderboard:', error.message, error.details, error.hint);
+        return;
+      }
+
+      container.innerHTML = '';
+      data.forEach((linha, indice) => {
+        const posicao = indice + 1;
+        const souEu = linha.participante_id === participanteAtual.id;
+        const item = document.createElement('div');
+        item.className = 'linha-leaderboard' + (souEu ? ' eu' : '') + (posicao <= 3 ? ' top' + posicao : '');
+        item.innerHTML = `
+          <div class="posicao-num">${posicao <= 3 ? ['🥇','🥈','🥉'][posicao-1] : posicao}</div>
+          <div class="info-lb">
+            <div class="nome-lb">${linha.nome}${souEu ? ' (tu)' : ''}</div>
+            <div class="junior-lb">${linha.junior_empresa ?? ''}</div>
+          </div>
+          <div class="pontos-lb">${linha.total_pontos}</div>
+        `;
+        container.appendChild(item);
+      });
+    }
+  </script>
+
+</body>
+</html>

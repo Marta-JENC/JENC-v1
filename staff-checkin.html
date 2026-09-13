@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Check-in — Staff JENC</title>
+<style>
+  :root {
+    --bg: #0F1B2B;
+    --card: #16263D;
+    --accent: #FF7A45;
+    --text: #F2F4F7;
+    --muted: #8FA0B8;
+    --border: #23374F;
+    --erro: #FF6B6B;
+    --sucesso: #7CD992;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 20px 16px 90px;
+    max-width: 520px;
+    margin-inline: auto;
+  }
+  header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 20px; }
+  h1 { font-size: 22px; margin: 0; }
+  .sub { color: var(--muted); font-size: 13px; margin: 4px 0 0; }
+  button.sair {
+    background:none; border:1px solid var(--border); color:var(--muted);
+    font-size:12px; padding:6px 10px; border-radius:8px; cursor:pointer;
+  }
+
+  .aviso-camara {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    display: none;
+  }
+
+  #reader {
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    background: var(--card);
+  }
+
+  .entrada-manual {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .entrada-manual input {
+    flex: 1;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    font-size: 14px;
+  }
+  .entrada-manual button {
+    padding: 12px 18px;
+    border-radius: 10px;
+    border: none;
+    background: var(--accent);
+    color: #201007;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .mensagem { font-size: 13px; text-align: center; margin-bottom: 16px; min-height: 18px; }
+  .mensagem.erro { color: var(--erro); }
+  .mensagem.sucesso { color: var(--sucesso); }
+
+  .cartao-perfil {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    display: none;
+  }
+  .cartao-perfil .nome { font-size: 20px; font-weight: 700; margin-bottom: 2px; }
+  .cartao-perfil .junior { color: var(--accent); font-size: 13px; font-weight: 600; margin-bottom: 18px; }
+
+  .linha-perfil {
+    display: flex;
+    justify-content: space-between;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .linha-perfil:last-of-type { border-bottom: none; }
+  .linha-perfil .rotulo { color: var(--muted); }
+  .linha-perfil .valor { font-weight: 600; text-align: right; }
+  .linha-perfil .valor.alerta { color: var(--erro); }
+
+  .agenda-hoje { margin-top: 16px; }
+  .agenda-hoje h4 { font-size: 12px; color: var(--muted); margin: 0 0 8px; }
+  .item-agenda {
+    display: flex; gap: 10px; font-size: 13px; padding: 6px 0;
+  }
+  .item-agenda .hora { color: var(--accent); font-weight: 600; width: 44px; flex-shrink: 0; }
+
+  .acoes-checkin { margin-top: 20px; }
+  .acoes-checkin .linha-tipo { display: flex; gap: 6px; margin-bottom: 10px; }
+  .tipo-opcao {
+    flex: 1; text-align: center; padding: 8px; border-radius: 8px;
+    background: var(--bg); border: 1px solid var(--border); color: var(--muted);
+    font-size: 12px; cursor: pointer;
+  }
+  .tipo-opcao.ativo { background: var(--accent); color: #201007; border-color: var(--accent); font-weight: 600; }
+  .linha-acoes { display: flex; gap: 8px; }
+  .botao-acao {
+    flex: 1; padding: 12px; border-radius: 10px; border: none;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+  .botao-acao.entrada { background: var(--sucesso); color: #08331a; }
+  .botao-acao.saida { background: var(--erro); color: #3a0b0b; }
+
+  .estado-carregamento { text-align: center; color: var(--muted); padding: 40px 0; font-size: 14px; }
+</style>
+</head>
+<body>
+
+  <header>
+    <div>
+      <h1>Check-in</h1>
+      <p class="sub" id="saudacao-staff">A carregar…</p>
+    </div>
+    <div style="display:flex; gap:8px;">
+      <a href="staff-inicio.html" style="background:none; border:1px solid var(--border); color:var(--muted); font-size:14px; padding:6px 10px; border-radius:8px; text-decoration:none;" title="Início">🏠</a>
+      <a href="staff-horario.html" style="background:none; border:1px solid var(--border); color:var(--muted); font-size:14px; padding:6px 10px; border-radius:8px; text-decoration:none;" title="O Meu Horário">🕓</a>
+      <a href="staff-equipa.html" style="background:none; border:1px solid var(--border); color:var(--muted); font-size:14px; padding:6px 10px; border-radius:8px; text-decoration:none;" title="Equipa">👥</a>
+      <a href="staff-atividades.html" style="background:none; border:1px solid var(--border); color:var(--muted); font-size:14px; padding:6px 10px; border-radius:8px; text-decoration:none;" title="Atividades">🗓️</a>
+      <button class="sair" onclick="terminarSessaoStaff()">Sair</button>
+    </div>
+  </header>
+
+  <div id="aviso-camara" class="aviso-camara"></div>
+  <div id="reader"></div>
+
+  <div class="entrada-manual">
+    <input type="text" id="input-manual" placeholder="Ou escreve o código (ex: JENC-001)">
+    <button onclick="procurarManual()">Procurar</button>
+  </div>
+
+  <div class="mensagem" id="mensagem"></div>
+
+  <div class="cartao-perfil" id="cartao-perfil">
+    <div class="nome" id="p-nome">—</div>
+    <div class="junior" id="p-junior">—</div>
+
+    <div class="linha-perfil"><span class="rotulo">Universidade</span><span class="valor" id="p-universidade">—</span></div>
+    <div class="linha-perfil"><span class="rotulo">Restrições alimentares</span><span class="valor" id="p-restricoes">—</span></div>
+    <div class="linha-perfil"><span class="rotulo">Alojamento</span><span class="valor" id="p-alojamento">—</span></div>
+    <div class="linha-perfil"><span class="rotulo">Quarto</span><span class="valor" id="p-quarto">—</span></div>
+    <div class="linha-perfil"><span class="rotulo">Turno refeição</span><span class="valor" id="p-turno">—</span></div>
+
+    <div class="agenda-hoje">
+      <h4>PROGRAMA DE HOJE</h4>
+      <div id="p-agenda"></div>
+    </div>
+
+    <div class="acoes-checkin">
+      <h4 style="font-size:12px; color:var(--muted); margin:0 0 8px;">1. ESCOLHE O TIPO DE CHECK-IN</h4>
+      <div class="linha-tipo">
+        <div class="tipo-opcao ativo" data-tipo="evento" onclick="escolherTipo('evento')">Evento</div>
+        <div class="tipo-opcao" data-tipo="alojamento" onclick="escolherTipo('alojamento')">Alojamento</div>
+        <div class="tipo-opcao" data-tipo="refeicao" onclick="escolherTipo('refeicao')">Refeição</div>
+      </div>
+      <div id="tipo-confirmado" style="font-size:12px; color: var(--accent); margin-bottom:14px;">Tipo selecionado: Evento</div>
+
+      <h4 style="font-size:12px; color:var(--muted); margin:0 0 8px;">2. REGISTA A ENTRADA OU SAÍDA</h4>
+      <div class="linha-acoes">
+        <button class="botao-acao entrada" onclick="registarCheckin('entrada')">✓ Entrada</button>
+        <button class="botao-acao saida" onclick="registarCheckin('saida')">✕ Saída</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabaseClient.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+
+  <script>
+    let staffAtual = null;
+    let participanteAtual = null;
+    let tipoSelecionado = 'evento';
+
+    init();
+
+    async function init() {
+      const user = await exigirSessaoStaff();
+      if (!user) return;
+
+      staffAtual = await getStaffAtual(user);
+      if (!staffAtual) {
+        document.getElementById('saudacao-staff').textContent = 'Conta sem acesso de staff.';
+        return;
+      }
+
+      document.getElementById('saudacao-staff').textContent = `Olá, ${staffAtual.nome ?? 'staff'} 👋`;
+      iniciarCamara();
+    }
+
+    // -----------------------------------------------------------------
+    // Câmara (só funciona em https:// ou http://localhost — nunca em
+    // file://, por restrição de segurança do browser)
+    // -----------------------------------------------------------------
+    function iniciarCamara() {
+      const aviso = document.getElementById('aviso-camara');
+
+      if (location.protocol === 'file:') {
+        aviso.style.display = 'block';
+        aviso.textContent = 'A câmara não funciona a abrir o ficheiro diretamente (file://). Usa o campo manual abaixo, ou corre este ficheiro num servidor local (ex: Live Server / localhost) para testares a câmara.';
+        return;
+      }
+
+      try {
+        const html5QrCode = new Html5Qrcode('reader');
+        html5QrCode.start(
+          { facingMode: 'environment' },
+          { fps: 10, qrbox: 240 },
+          (codigoLido) => processarCodigo(codigoLido),
+          () => {} // ignora erros de frame sem QR (é normal, acontece a cada frame sem código visível)
+        ).catch(() => {
+          aviso.style.display = 'block';
+          aviso.textContent = 'Não foi possível aceder à câmara. Usa o campo manual abaixo.';
+        });
+      } catch (e) {
+        aviso.style.display = 'block';
+        aviso.textContent = 'Não foi possível aceder à câmara. Usa o campo manual abaixo.';
+      }
+    }
+
+    function procurarManual() {
+      const codigo = document.getElementById('input-manual').value.trim();
+      if (codigo) processarCodigo(codigo);
+    }
+
+    // -----------------------------------------------------------------
+    async function processarCodigo(codigo) {
+      mostrarMensagem('A procurar…');
+      document.getElementById('cartao-perfil').style.display = 'none';
+
+      const { data: participante, error } = await supabaseClient
+        .from('participantes')
+        .select('*')
+        .eq('qr_code', codigo)
+        .single();
+
+      if (error || !participante) {
+        mostrarMensagem(`Código "${codigo}" não encontrado.`, 'erro');
+        participanteAtual = null;
+        return;
+      }
+
+      participanteAtual = participante;
+      mostrarMensagem('');
+      await renderPerfil(participante);
+    }
+
+    async function renderPerfil(p) {
+      document.getElementById('p-nome').textContent = p.nome ?? '—';
+      document.getElementById('p-junior').textContent = p.junior_empresa ?? '—';
+      document.getElementById('p-universidade').textContent = p.universidade ?? '—';
+
+      const elRestricoes = document.getElementById('p-restricoes');
+      elRestricoes.textContent = p.restricoes_alimentares || 'Nenhuma';
+      elRestricoes.className = 'valor' + (p.restricoes_alimentares && p.restricoes_alimentares !== 'Nenhuma' ? ' alerta' : '');
+
+      document.getElementById('p-turno').textContent = p.turno_refeicao ?? 'Não atribuído';
+
+      // Alojamento + quarto (mesma lógica usada nas outras páginas)
+      if (p.alojamento) {
+        const { data: alojamento } = await supabaseClient.from('alojamentos').select('nome').eq('id', p.alojamento).single();
+        document.getElementById('p-alojamento').textContent = alojamento?.nome ?? '—';
+      } else {
+        document.getElementById('p-alojamento').textContent = 'Não atribuído';
+      }
+
+      if (p.quarto_id) {
+        const { data: quarto } = await supabaseClient.from('quartos').select('numero').eq('id', p.quarto_id).single();
+        document.getElementById('p-quarto').textContent = quarto?.numero ?? '—';
+      } else {
+        document.getElementById('p-quarto').textContent = 'Não atribuído';
+      }
+
+      // Programa de hoje
+      const hoje = new Date().toISOString().split('T')[0];
+      const { data: atividades } = await supabaseClient
+        .from('atividades')
+        .select('nome, hora_inicio, local')
+        .eq('data', hoje)
+        .order('hora_inicio', { ascending: true });
+
+      const elAgenda = document.getElementById('p-agenda');
+      elAgenda.innerHTML = '';
+      if (!atividades || atividades.length === 0) {
+        elAgenda.innerHTML = '<div class="item-agenda">Sem atividades hoje.</div>';
+      } else {
+        atividades.forEach(a => {
+          const item = document.createElement('div');
+          item.className = 'item-agenda';
+          item.innerHTML = `<span class="hora">${a.hora_inicio?.slice(0,5) ?? '--:--'}</span><span>${a.nome} — 📍 ${a.local ?? '—'}</span>`;
+          elAgenda.appendChild(item);
+        });
+      }
+
+      document.getElementById('cartao-perfil').style.display = 'block';
+    }
+
+    const ROTULOS_TIPO = { evento: 'Evento', alojamento: 'Alojamento', refeicao: 'Refeição' };
+
+    function escolherTipo(tipo) {
+      tipoSelecionado = tipo;
+      document.querySelectorAll('.tipo-opcao').forEach(el => {
+        el.classList.toggle('ativo', el.dataset.tipo === tipo);
+      });
+      document.getElementById('tipo-confirmado').textContent = `Tipo selecionado: ${ROTULOS_TIPO[tipo]}`;
+    }
+
+    async function registarCheckin(acao) {
+      if (!participanteAtual) {
+        mostrarMensagem('Procura primeiro um participante (câmara ou código manual).', 'erro');
+        return;
+      }
+
+      const nomeParticipante = participanteAtual.nome;
+
+      const { error } = await supabaseClient.from('checkins').insert({
+        participante_id: participanteAtual.id,
+        lido_por: staffAtual.id,
+        tipo: tipoSelecionado,
+        acao: acao
+      });
+
+      if (error) {
+        mostrarMensagem('Erro ao registar: ' + error.message, 'erro');
+        return;
+      }
+
+      mostrarMensagem(
+        `${acao === 'entrada' ? 'Entrada' : 'Saída'} registada para ${nomeParticipante} (${ROTULOS_TIPO[tipoSelecionado]}).`,
+        'sucesso'
+      );
+
+      // Prepara o ecrã para o próximo participante
+      participanteAtual = null;
+      document.getElementById('cartao-perfil').style.display = 'none';
+      document.getElementById('input-manual').value = '';
+      escolherTipo('evento');
+    }
+
+    function mostrarMensagem(texto, tipo) {
+      const el = document.getElementById('mensagem');
+      el.textContent = texto;
+      el.className = 'mensagem' + (tipo ? ' ' + tipo : '');
+    }
+
+    async function terminarSessaoStaff() {
+      await supabaseClient.auth.signOut();
+      window.location.href = 'login.html';
+    }
+  </script>
+
+</body>
+</html>

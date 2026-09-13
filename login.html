@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entrar — JENC</title>
+<style>
+  :root {
+    --bg: #0F1B2B;
+    --card: #16263D;
+    --accent: #FF7A45;
+    --text: #F2F4F7;
+    --muted: #8FA0B8;
+    --border: #23374F;
+    --erro: #FF6B6B;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 20px;
+  }
+  .caixa {
+    width: 100%;
+    max-width: 380px;
+  }
+  h1 { font-size: 24px; margin: 0 0 6px; }
+  .sub { color: var(--muted); font-size: 14px; margin: 0 0 28px; }
+
+  .abas { display: flex; gap: 8px; margin-bottom: 20px; }
+  .aba {
+    flex: 1; text-align: center; padding: 10px; border-radius: 10px;
+    background: var(--card); border: 1px solid var(--border);
+    color: var(--muted); font-size: 14px; cursor: pointer; user-select: none;
+  }
+  .aba.ativa { background: var(--accent); color: #201007; font-weight: 600; border-color: var(--accent); }
+
+  label { font-size: 13px; color: var(--muted); display: block; margin: 14px 0 6px; }
+  input {
+    width: 100%; padding: 12px 14px; border-radius: 10px;
+    border: 1px solid var(--border); background: var(--card); color: var(--text);
+    font-size: 14px;
+  }
+  input:focus { outline: none; border-color: var(--accent); }
+
+  button.principal {
+    width: 100%; margin-top: 22px; padding: 13px; border: none; border-radius: 10px;
+    background: var(--accent); color: #201007; font-size: 15px; font-weight: 600; cursor: pointer;
+  }
+  button.principal:disabled { opacity: 0.6; cursor: default; }
+
+  .mensagem { margin-top: 14px; font-size: 13px; text-align: center; min-height: 18px; }
+  .mensagem.erro { color: var(--erro); }
+  .mensagem.sucesso { color: #7CD992; }
+</style>
+</head>
+<body>
+
+  <div class="caixa">
+    <h1>JENC</h1>
+    <p class="sub">Entra com a tua conta (participante ou staff).</p>
+
+    <label for="email">Email</label>
+    <input type="email" id="email" placeholder="tu@exemplo.com" autocomplete="email">
+
+    <label for="password">Palavra-passe</label>
+    <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+
+    <button class="principal" id="botao-principal" onclick="entrar()">Entrar</button>
+
+    <div class="mensagem" id="mensagem"></div>
+  </div>
+
+  <!-- 1. Biblioteca do Supabase como script normal (não é módulo) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- 2. O teu cliente Supabase -->
+  <script src="supabaseClient.js"></script>
+
+  <script>
+    // Se já houver sessão ativa, descobre o tipo de conta e salta logo
+    // para a página certa (participante ou staff).
+    verificarSessaoExistente();
+    async function verificarSessaoExistente() {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (session) await redirecionarConformeTipo(session.user);
+    }
+
+    async function entrar() {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const botao = document.getElementById('botao-principal');
+
+      if (!email || !password) {
+        mostrarMensagem('Preenche o email e a palavra-passe.', 'erro');
+        return;
+      }
+
+      botao.disabled = true;
+      mostrarMensagem('A processar…');
+
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+      if (error) {
+        mostrarMensagem(traduzirErro(error), 'erro');
+        botao.disabled = false;
+        return;
+      }
+
+      const encontrouConta = await redirecionarConformeTipo(data.user);
+      if (!encontrouConta) {
+        mostrarMensagem('Esta conta não está associada a nenhum participante nem membro de staff. Contacta a organização.', 'erro');
+        await supabaseClient.auth.signOut();
+        botao.disabled = false;
+      }
+    }
+
+    // Verifica se o utilizador tem linha em `staff` ou em `participantes`
+    // e redireciona para a página correspondente. Devolve false se não
+    // encontrar nenhuma das duas (conta sem acesso).
+    async function redirecionarConformeTipo(user) {
+      const { data: staff } = await supabaseClient
+        .from('staff')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (staff) {
+        window.location.href = 'staff-inicio.html';
+        return true;
+      }
+
+      const { data: participante } = await supabaseClient
+        .from('participantes')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (participante) {
+        window.location.href = 'inicio.html';
+        return true;
+      }
+
+      return false;
+    }
+
+    function traduzirErro(error) {
+      const msg = error.message || '';
+      if (msg.includes('Invalid login credentials')) return 'Email ou palavra-passe incorretos.';
+      return 'Ocorreu um erro: ' + msg;
+    }
+
+    function mostrarMensagem(texto, tipo) {
+      const el = document.getElementById('mensagem');
+      el.textContent = texto;
+      el.className = 'mensagem' + (tipo ? ' ' + tipo : '');
+    }
+  </script>
+
+</body>
+</html>

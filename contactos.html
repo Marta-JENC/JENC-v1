@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contactos — JENC</title>
+<style>
+  :root {
+    --bg: #0F1B2B;
+    --card: #16263D;
+    --accent: #FF7A45;
+    --text: #F2F4F7;
+    --muted: #8FA0B8;
+    --border: #23374F;
+    --erro: #FF6B6B;
+    --sucesso: #7CD992;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 20px 16px 90px;
+    max-width: 480px;
+    margin-inline: auto;
+  }
+  .voltar {
+    display: inline-block;
+    color: var(--muted);
+    font-size: 13px;
+    text-decoration: none;
+    margin-bottom: 14px;
+  }
+  h1 { font-size: 22px; margin: 0 0 6px; }
+  .sub { color: var(--muted); font-size: 13px; margin: 0 0 18px; }
+
+  .cartao-progresso {
+    background: linear-gradient(135deg, var(--accent), #FF9466);
+    border-radius: 14px;
+    padding: 16px 18px;
+    color: #201007;
+    margin-bottom: 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .cartao-progresso .tag { font-size: 11px; font-weight: 700; opacity: 0.8; }
+  .cartao-progresso .valor { font-size: 20px; font-weight: 800; margin-top: 2px; }
+
+  .aviso-camara {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    display: none;
+  }
+  #reader {
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    background: var(--card);
+  }
+
+  .entrada-manual { display: flex; gap: 8px; margin-bottom: 16px; }
+  .entrada-manual input {
+    flex: 1; padding: 12px 14px; border-radius: 10px;
+    border: 1px solid var(--border); background: var(--card); color: var(--text); font-size: 14px;
+  }
+  .entrada-manual button {
+    padding: 12px 18px; border-radius: 10px; border: none;
+    background: var(--accent); color: #201007; font-weight: 600; cursor: pointer;
+  }
+
+  .mensagem { font-size: 13px; text-align: center; margin-bottom: 16px; min-height: 18px; }
+  .mensagem.erro { color: var(--erro); }
+  .mensagem.sucesso { color: var(--sucesso); }
+
+  .cartao-encontrado {
+    background: var(--card);
+    border: 1px solid var(--sucesso);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 20px;
+    display: none;
+  }
+  .cartao-encontrado .nome { font-size: 16px; font-weight: 700; margin-bottom: 2px; }
+  .cartao-encontrado .detalhe { font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+  .cartao-encontrado a.linkedin {
+    display: inline-block; font-size: 12px; color: var(--accent); text-decoration: none; font-weight: 600;
+  }
+
+  section h3 { font-size: 13px; color: var(--muted); margin: 24px 0 10px; font-weight: 600; }
+  .item-contacto {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+  }
+  .item-contacto .nome { font-size: 14px; font-weight: 600; }
+  .item-contacto .detalhe { font-size: 12px; color: var(--muted); margin: 2px 0 6px; }
+  .item-contacto a.linkedin { font-size: 12px; color: var(--accent); text-decoration: none; font-weight: 600; }
+
+  .vazio, .estado { text-align: center; color: var(--muted); padding: 30px 0; font-size: 14px; }
+</style>
+</head>
+<body>
+
+  <a class="voltar" href="inicio.html">← Início</a>
+  <h1>Contactos</h1>
+  <p class="sub">Lê o QR Code de outro participante para trocarem contacto.</p>
+
+  <div class="cartao-progresso">
+    <div>
+      <div class="tag">CONNECT & COLLECT</div>
+      <div class="valor" id="progresso-contactos">0 / 5 contactos</div>
+    </div>
+    <div id="badge-concluido" style="display:none; font-size:24px;">🏆</div>
+  </div>
+
+  <div id="aviso-camara" class="aviso-camara"></div>
+  <div id="reader"></div>
+
+  <div class="entrada-manual">
+    <input type="text" id="input-manual" placeholder="Ou escreve o código (ex: JENC-001)">
+    <button onclick="procurarManual()">Adicionar</button>
+  </div>
+
+  <div class="mensagem" id="mensagem"></div>
+
+  <div class="cartao-encontrado" id="cartao-encontrado">
+    <div class="nome" id="ce-nome">—</div>
+    <div class="detalhe" id="ce-detalhe">—</div>
+    <a class="linkedin" id="ce-linkedin" href="#" target="_blank" style="display:none;">Ver LinkedIn →</a>
+  </div>
+
+  <section>
+    <h3>Os teus contactos</h3>
+    <div id="lista-contactos"></div>
+    <div class="vazio" id="contactos-vazio" style="display:none;">Ainda não adicionaste ninguém. Lê o primeiro QR Code acima!</div>
+  </section>
+
+  <!-- 1. Biblioteca do Supabase como script normal (não é módulo) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- 2. O teu cliente Supabase -->
+  <script src="supabaseClient.js"></script>
+  <!-- 3. Leitor de câmara (mesma biblioteca usada no staff-checkin) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+
+  <script>
+    init();
+
+    async function init() {
+      const user = await exigirSessao();
+      if (!user) return;
+
+      iniciarCamara();
+      await carregarContactos();
+    }
+
+    // -----------------------------------------------------------------
+    // Câmara (só funciona em https:// ou http://localhost — nunca em
+    // file://, tal como no check-in do staff)
+    // -----------------------------------------------------------------
+    function iniciarCamara() {
+      const aviso = document.getElementById('aviso-camara');
+
+      if (location.protocol === 'file:') {
+        aviso.style.display = 'block';
+        aviso.textContent = 'A câmara não funciona a abrir o ficheiro diretamente (file://). Usa o campo manual abaixo, ou corre isto num servidor (https/localhost) para testares a câmara.';
+        return;
+      }
+
+      try {
+        const html5QrCode = new Html5Qrcode('reader');
+        html5QrCode.start(
+          { facingMode: 'environment' },
+          { fps: 10, qrbox: 240 },
+          (codigoLido) => adicionarContacto(codigoLido),
+          () => {}
+        ).catch(() => {
+          aviso.style.display = 'block';
+          aviso.textContent = 'Não foi possível aceder à câmara. Usa o campo manual abaixo.';
+        });
+      } catch (e) {
+        aviso.style.display = 'block';
+        aviso.textContent = 'Não foi possível aceder à câmara. Usa o campo manual abaixo.';
+      }
+    }
+
+    function procurarManual() {
+      const codigo = document.getElementById('input-manual').value.trim();
+      if (codigo) adicionarContacto(codigo);
+    }
+
+    // -----------------------------------------------------------------
+    async function adicionarContacto(codigo) {
+      mostrarMensagem('A adicionar…');
+      document.getElementById('cartao-encontrado').style.display = 'none';
+
+      const { data, error } = await supabaseClient.rpc('adicionar_contacto', { codigo });
+
+      if (error) {
+        mostrarMensagem(error.message, 'erro');
+        return;
+      }
+
+      const pessoa = data?.[0];
+      if (!pessoa) {
+        mostrarMensagem('Código não encontrado.', 'erro');
+        return;
+      }
+
+      document.getElementById('input-manual').value = '';
+      mostrarMensagem(
+        pessoa.ja_existia ? `Já tinhas ${pessoa.nome} nos teus contactos.` : `${pessoa.nome} adicionado(a) aos teus contactos! 🎉`,
+        'sucesso'
+      );
+      renderPessoaEncontrada(pessoa);
+
+      await carregarContactos();
+      await verificarDesafioContactos();
+    }
+
+    function renderPessoaEncontrada(p) {
+      document.getElementById('ce-nome').textContent = p.nome ?? '—';
+      document.getElementById('ce-detalhe').textContent = [p.junior_empresa, p.universidade].filter(Boolean).join(' · ');
+
+      const elLinkedin = document.getElementById('ce-linkedin');
+      if (p.linkedin) {
+        elLinkedin.href = p.linkedin.startsWith('http') ? p.linkedin : `https://${p.linkedin}`;
+        elLinkedin.style.display = 'inline-block';
+      } else {
+        elLinkedin.style.display = 'none';
+      }
+
+      document.getElementById('cartao-encontrado').style.display = 'block';
+    }
+
+    async function carregarContactos() {
+      const { data, error } = await supabaseClient.rpc('meus_contactos');
+      const container = document.getElementById('lista-contactos');
+      const vazio = document.getElementById('contactos-vazio');
+
+      if (error) {
+        console.error('Erro ao ir buscar contactos:', error.message, error.details, error.hint);
+        container.innerHTML = '';
+        vazio.style.display = 'block';
+        vazio.textContent = 'Não foi possível carregar os teus contactos.';
+        return;
+      }
+
+      const contactos = data ?? [];
+      document.getElementById('progresso-contactos').textContent = `${Math.min(contactos.length, 5)} / 5 contactos`;
+      document.getElementById('badge-concluido').style.display = contactos.length >= 5 ? 'inline-block' : 'none';
+
+      container.innerHTML = '';
+      if (contactos.length === 0) {
+        vazio.style.display = 'block';
+        return;
+      }
+      vazio.style.display = 'none';
+
+      contactos.forEach(c => {
+        const item = document.createElement('div');
+        item.className = 'item-contacto';
+        const linkedinUrl = c.linkedin ? (c.linkedin.startsWith('http') ? c.linkedin : `https://${c.linkedin}`) : null;
+        item.innerHTML = `
+          <div class="nome">${c.nome ?? '—'}</div>
+          <div class="detalhe">${[c.junior_empresa, c.universidade].filter(Boolean).join(' · ')}</div>
+          ${linkedinUrl ? `<a class="linkedin" href="${linkedinUrl}" target="_blank">Ver LinkedIn →</a>` : ''}
+        `;
+        container.appendChild(item);
+      });
+
+      return contactos.length;
+    }
+
+    // -----------------------------------------------------------------
+    // Se já tens 5+ contactos e ainda não recebeste os pontos do
+    // desafio "Connect & Collect", atribui-os automaticamente agora.
+    // -----------------------------------------------------------------
+    async function verificarDesafioContactos() {
+      const { data: contactos } = await supabaseClient.rpc('meus_contactos');
+      if (!contactos || contactos.length < 5) return;
+
+      const { data: desafio } = await supabaseClient
+        .from('desafios')
+        .select('id, pontos, nome')
+        .eq('tipo', 'contactos')
+        .maybeSingle();
+      if (!desafio) return;
+
+      const user = await exigirSessao();
+      const participante = await getParticipanteAtual(user);
+      if (!participante) return;
+
+      const { data: jaTem } = await supabaseClient
+        .from('gamification')
+        .select('id')
+        .eq('participante_id', participante.id)
+        .eq('desafio_id', desafio.id)
+        .eq('estado', 'aprovado')
+        .maybeSingle();
+
+      if (jaTem) return; // já tinha recebido os pontos antes
+
+      await supabaseClient.from('gamification').insert({
+        participante_id: participante.id,
+        desafio_id: desafio.id,
+        desafio: desafio.nome,
+        pontos: desafio.pontos,
+        estado: 'aprovado'
+      });
+
+      mostrarMensagem(`🏆 Desafio "Connect & Collect" completo! +${desafio.pontos} pontos.`, 'sucesso');
+    }
+
+    function mostrarMensagem(texto, tipo) {
+      const el = document.getElementById('mensagem');
+      el.textContent = texto;
+      el.className = 'mensagem' + (tipo ? ' ' + tipo : '');
+    }
+  </script>
+
+</body>
+</html>

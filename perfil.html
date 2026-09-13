@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Perfil — JENC</title>
+<style>
+  :root {
+    --bg: #0F1B2B;
+    --card: #16263D;
+    --accent: #FF7A45;
+    --text: #F2F4F7;
+    --muted: #8FA0B8;
+    --border: #23374F;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 20px 16px 90px;
+    max-width: 480px;
+    margin-inline: auto;
+  }
+  .voltar {
+    display: inline-block;
+    color: var(--muted);
+    font-size: 13px;
+    text-decoration: none;
+    margin-bottom: 14px;
+  }
+  h1 { font-size: 22px; margin: 0 0 20px; }
+
+  .avatar {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; font-weight: 700; color: #201007;
+    margin: 0 auto 10px;
+  }
+  .nome-principal {
+    text-align: center; font-size: 18px; font-weight: 600; margin-bottom: 2px;
+  }
+  .subtitulo-principal {
+    text-align: center; font-size: 13px; color: var(--muted); margin-bottom: 24px;
+  }
+
+  .campo {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+  }
+  .campo .rotulo { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .campo .valor { font-size: 14px; font-weight: 500; }
+  .campo a.valor { color: var(--accent); text-decoration: none; }
+
+  .botao-perigo {
+    display: block;
+    width: 100%;
+    margin-top: 26px;
+    padding: 13px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: none;
+    color: #FF6B6B;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .estado { text-align: center; color: var(--muted); padding: 40px 0; font-size: 14px; }
+</style>
+</head>
+<body>
+
+  <a class="voltar" href="inicio.html">← Início</a>
+  <h1>Perfil</h1>
+
+  <div id="conteudo" style="display:none;">
+    <div class="avatar" id="avatar-iniciais">—</div>
+    <div class="nome-principal" id="nome-principal">—</div>
+    <div class="subtitulo-principal" id="subtitulo-principal">—</div>
+
+    <div class="campo">
+      <div class="rotulo">Universidade</div>
+      <div class="valor" id="valor-universidade">—</div>
+    </div>
+    <div class="campo">
+      <div class="rotulo">Júnior Empresa</div>
+      <div class="valor" id="valor-junior-empresa">—</div>
+    </div>
+    <div class="campo">
+      <div class="rotulo">Email</div>
+      <div class="valor" id="valor-email">—</div>
+    </div>
+    <div class="campo">
+      <div class="rotulo">Restrições alimentares</div>
+      <div class="valor" id="valor-restricoes">—</div>
+    </div>
+    <div class="campo">
+      <div class="rotulo">LinkedIn</div>
+      <div class="valor"><a id="valor-linkedin" class="valor" href="#" target="_blank">—</a></div>
+    </div>
+
+    <button class="botao-perigo" onclick="terminarSessao()">Terminar sessão</button>
+  </div>
+
+  <div class="estado" id="carregamento">A carregar perfil…</div>
+
+  <!-- 1. Biblioteca do Supabase como script normal (não é módulo) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- 2. O teu cliente Supabase -->
+  <script src="supabaseClient.js"></script>
+
+  <script>
+    init();
+
+    async function init() {
+      const user = await exigirSessao();
+      if (!user) return;
+
+      const participante = await getParticipanteAtual(user);
+      if (!participante) {
+        document.getElementById('carregamento').textContent =
+          'Não foi possível carregar o teu perfil. Contacta a organização.';
+        return;
+      }
+
+      render(participante);
+      document.getElementById('carregamento').style.display = 'none';
+      document.getElementById('conteudo').style.display = 'block';
+    }
+
+    function render(p) {
+      const iniciais = p.nome
+        ? p.nome.split(' ').map(parte => parte[0]).slice(0, 2).join('').toUpperCase()
+        : '?';
+
+      document.getElementById('avatar-iniciais').textContent = iniciais;
+      document.getElementById('nome-principal').textContent = p.nome ?? '—';
+      document.getElementById('subtitulo-principal').textContent = p.qr_code ?? '';
+      document.getElementById('valor-universidade').textContent = p.universidade ?? '—';
+      document.getElementById('valor-junior-empresa').textContent = p.junior_empresa ?? '—';
+      document.getElementById('valor-email').textContent = p.email ?? '—';
+      document.getElementById('valor-restricoes').textContent = p.restricoes_alimentares || 'Nenhuma';
+
+      const linkedinEl = document.getElementById('valor-linkedin');
+      if (p.linkedin) {
+        const url = p.linkedin.startsWith('http') ? p.linkedin : `https://${p.linkedin}`;
+        linkedinEl.href = url;
+        linkedinEl.textContent = p.linkedin;
+      } else {
+        linkedinEl.removeAttribute('href');
+        linkedinEl.textContent = '—';
+      }
+    }
+
+    async function terminarSessao() {
+      await supabaseClient.auth.signOut();
+      window.location.href = 'login.html';
+    }
+  </script>
+
+</body>
+</html>

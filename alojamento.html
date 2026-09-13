@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alojamento — JENC</title>
+<style>
+  :root {
+    --bg: #0F1B2B;
+    --card: #16263D;
+    --accent: #FF7A45;
+    --text: #F2F4F7;
+    --muted: #8FA0B8;
+    --border: #23374F;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 20px 16px 90px;
+    max-width: 480px;
+    margin-inline: auto;
+  }
+  .voltar {
+    display: inline-block;
+    color: var(--muted);
+    font-size: 13px;
+    text-decoration: none;
+    margin-bottom: 14px;
+  }
+  h1 { font-size: 22px; margin: 0 0 20px; }
+
+  .cartao-principal {
+    background: linear-gradient(135deg, var(--accent), #FF9466);
+    border-radius: 16px;
+    padding: 22px;
+    color: #201007;
+    margin-bottom: 20px;
+  }
+  .cartao-principal .tag { font-size: 12px; font-weight: 600; opacity: 0.75; }
+  .cartao-principal h2 { font-size: 22px; margin: 6px 0 0; }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+  .card .rotulo { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .card .valor { font-size: 16px; font-weight: 600; }
+
+  .campo-largo { margin-top: 10px; }
+  .campo-largo .rotulo { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .campo-largo .valor { font-size: 14px; }
+
+  .estado { text-align: center; color: var(--muted); padding: 40px 0; font-size: 14px; }
+</style>
+</head>
+<body>
+
+  <a class="voltar" href="inicio.html">← Início</a>
+  <h1>O meu alojamento</h1>
+
+  <div id="conteudo" style="display:none;">
+    <div class="cartao-principal">
+      <div class="tag">HOTEL / RESIDÊNCIA</div>
+      <h2 id="nome-alojamento">—</h2>
+    </div>
+
+    <div class="grid2" style="grid-template-columns: 1fr;">
+      <div class="card">
+        <div class="rotulo">Quarto</div>
+        <div class="valor" id="numero-quarto">—</div>
+      </div>
+    </div>
+
+    <!-- Card de Estado (check-in) escondido até termos a página de check-in do staff -->
+    <div class="card" id="card-estado-checkin">
+      <div class="rotulo">Estado</div>
+      <div class="valor" id="estado-checkin">—</div>
+    </div>
+
+    <div class="card campo-largo" id="card-morada" style="display:none;">
+      <div class="rotulo">Morada</div>
+      <div class="valor" id="morada-alojamento">—</div>
+    </div>
+  </div>
+
+  <div class="estado" id="carregamento">A carregar…</div>
+
+  <!-- 1. Biblioteca do Supabase como script normal (não é módulo) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- 2. O teu cliente Supabase -->
+  <script src="supabaseClient.js"></script>
+
+  <script>
+    init();
+
+    async function init() {
+      const user = await exigirSessao();
+      if (!user) return;
+
+      const participante = await getParticipanteAtual(user);
+      if (!participante) {
+        document.getElementById('carregamento').textContent =
+          'Não foi possível carregar os teus dados. Contacta a organização.';
+        return;
+      }
+
+      if (!participante.alojamento) {
+        document.getElementById('carregamento').textContent =
+          'Ainda não tens alojamento atribuído. A organização vai atualizar isto em breve.';
+        return;
+      }
+
+      const alojamento = await getAlojamento(participante.alojamento);
+      const estadoCheckin = await getEstadoCheckin(participante.id);
+      render(participante, alojamento, estadoCheckin);
+
+      document.getElementById('carregamento').style.display = 'none';
+      document.getElementById('conteudo').style.display = 'block';
+    }
+
+    async function getEstadoCheckin(participanteId) {
+      const { data, error } = await supabaseClient
+        .from('checkins')
+        .select('acao, criado_em')
+        .eq('participante_id', participanteId)
+        .eq('tipo', 'alojamento')
+        .order('criado_em', { ascending: false })
+        .limit(1);
+
+      if (error) {
+        console.error('Erro ao ir buscar o estado de check-in:', error.message, error.details, error.hint);
+        return null;
+      }
+
+      return data?.[0] ?? null;
+    }
+
+    async function getAlojamento(alojamentoId) {
+      const { data, error } = await supabaseClient
+        .from('alojamentos')
+        .select('nome, local_id')
+        .eq('id', alojamentoId)
+        .single();
+
+      if (error) {
+        console.error('Erro ao ir buscar o alojamento:', error.message, error.details, error.hint);
+        return null;
+      }
+
+      // Se existir um local associado, vai buscar a descrição/morada
+      if (data.local_id) {
+        const { data: local } = await supabaseClient
+          .from('locais')
+          .select('descricao')
+          .eq('id', data.local_id)
+          .single();
+        data.morada = local?.descricao ?? null;
+      }
+
+      return data;
+    }
+
+    function render(participante, alojamento, estadoCheckin) {
+      document.getElementById('nome-alojamento').textContent = alojamento?.nome ?? '—';
+      document.getElementById('numero-quarto').textContent = participante.numero_quarto ?? '—';
+
+      const elEstado = document.getElementById('estado-checkin');
+      if (!estadoCheckin) {
+        elEstado.textContent = 'Por fazer';
+      } else {
+        const dataHora = new Date(estadoCheckin.criado_em);
+        const horaFormatada = dataHora.toLocaleString('pt-PT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+        elEstado.textContent = estadoCheckin.acao === 'entrada'
+          ? `Check-in feito (${horaFormatada})`
+          : `Check-out feito (${horaFormatada})`;
+      }
+
+      if (alojamento?.morada) {
+        document.getElementById('morada-alojamento').textContent = alojamento.morada;
+        document.getElementById('card-morada').style.display = 'block';
+      }
+    }
+  </script>
+
+</body>
+</html>

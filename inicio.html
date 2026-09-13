@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>O Meu Evento — JENC</title>
+<style>
+  :root {
+    --bg: #0F1B2B;
+    --card: #16263D;
+    --accent: #FF7A45;
+    --text: #F2F4F7;
+    --muted: #8FA0B8;
+    --border: #23374F;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 24px 16px 90px;
+    max-width: 480px;
+    margin-inline: auto;
+  }
+  header h1 { font-size: 22px; font-weight: 600; margin: 0 0 4px; }
+  header p { margin: 0; color: var(--muted); font-size: 14px; }
+  .proxima-atividade {
+    margin-top: 24px;
+    background: linear-gradient(135deg, var(--accent), #FF9466);
+    border-radius: 16px;
+    padding: 20px;
+    color: #201007;
+  }
+  .proxima-atividade .tag { font-size: 12px; font-weight: 600; opacity: 0.75; }
+  .proxima-atividade h2 { font-size: 20px; margin: 6px 0 10px; }
+  .proxima-atividade .linha {
+    font-size: 14px; display: flex; gap: 6px; align-items: center; margin-bottom: 4px;
+  }
+  .proxima-atividade .countdown {
+    margin-top: 12px; font-size: 13px; font-weight: 600;
+    background: rgba(0,0,0,0.15); display: inline-block; padding: 4px 10px; border-radius: 999px;
+  }
+  section { margin-top: 28px; }
+  section h3 { font-size: 13px; color: var(--muted); margin: 0 0 10px; font-weight: 600; }
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 16px; margin-bottom: 10px;
+  }
+  .agenda-item { display: flex; gap: 14px; align-items: center; }
+  .agenda-item .hora { font-weight: 600; font-size: 14px; width: 48px; flex-shrink: 0; color: var(--accent); }
+  .agenda-item .info .nome { font-size: 14px; font-weight: 500; }
+  .agenda-item .info .local { font-size: 12px; color: var(--muted); }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .mini-card .rotulo { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .mini-card .valor { font-size: 15px; font-weight: 600; }
+  .estado { text-align: center; color: var(--muted); padding: 40px 0; font-size: 14px; }
+  .botao-secundario {
+    display: block;
+    text-align: center;
+    margin-top: 6px;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    color: var(--text);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+
+  <header style="display:flex; justify-content:space-between; align-items:flex-start;">
+    <div>
+      <h1 id="saudacao">Olá 👋</h1>
+      <p id="subtitulo">A carregar o teu evento...</p>
+    </div>
+    <div style="display:flex; gap:8px;">
+      <a href="mapa.html" style="background:none; border:1px solid var(--border); color:var(--muted); font-size:14px; padding:6px 10px; border-radius:8px; text-decoration:none;" title="Mapa">🗺️</a>
+      <a href="gamificacao.html" style="background:none; border:1px solid var(--border); color:var(--muted); font-size:14px; padding:6px 10px; border-radius:8px; text-decoration:none;" title="Gamificação">🏆</a>
+      <a href="qr-code.html" style="background:none; border:1px solid var(--border); color:var(--muted); font-size:14px; padding:6px 10px; border-radius:8px; text-decoration:none;" title="QR Code">▦</a>
+      <a href="contactos.html" style="background:none; border:1px solid var(--border); color:var(--muted); font-size:14px; padding:6px 10px; border-radius:8px; text-decoration:none;" title="Contactos">🤝</a>
+      <a href="perfil.html" style="background:none; border:1px solid var(--border); color:var(--muted); font-size:14px; padding:6px 10px; border-radius:8px; text-decoration:none;" title="Perfil">👤</a>
+    </div>
+  </header>
+
+  <div id="conteudo" style="display:none;">
+
+    <div class="proxima-atividade" id="bloco-proxima-atividade">
+      <div class="tag">PRÓXIMA ATIVIDADE</div>
+      <h2 id="pa-nome">—</h2>
+      <div class="linha">📍 <span id="pa-local">—</span></div>
+      <div class="linha">🕐 <span id="pa-hora">—</span></div>
+      <div class="countdown" id="pa-countdown"></div>
+      <a href="#" id="pa-ver-mapa" style="display:none; margin-top:10px; font-size:12px; font-weight:700; color:#201007; text-decoration:underline;">Ver no mapa →</a>
+    </div>
+
+    <section>
+      <h3>Agenda de hoje</h3>
+      <div id="lista-agenda"></div>
+      <a href="agenda.html" class="botao-secundario">Ver agenda completa →</a>
+    </section>
+
+    <section>
+      <h3>O essencial</h3>
+      <div class="grid2">
+        <a href="alojamento.html" class="card mini-card" style="text-decoration:none; color:inherit; display:block;">
+          <div class="rotulo">Alojamento</div>
+          <div class="valor" id="info-alojamento">—</div>
+        </a>
+        <div class="card mini-card">
+          <div class="rotulo">Quarto</div>
+          <div class="valor" id="info-quarto">—</div>
+        </div>
+        <a href="refeicoes.html" class="card mini-card" style="text-decoration:none; color:inherit; display:block;">
+          <div class="rotulo">Refeição</div>
+          <div class="valor" id="info-refeicao">—</div>
+        </a>
+        <div class="card mini-card">
+          <div class="rotulo">Universidade</div>
+          <div class="valor" id="info-universidade">—</div>
+        </div>
+      </div>
+    </section>
+
+    <button id="botao-sair" style="
+      width: 100%; margin-top: 12px; padding: 12px; border: none; border-radius: 10px;
+      background: transparent; border: 1px solid var(--border); color: var(--muted);
+      font-size: 13px; cursor: pointer;
+    ">Sair</button>
+
+  </div>
+
+  <div id="estado-carregamento" class="estado">A carregar…</div>
+
+  <!-- 1. Carrega a biblioteca do Supabase (versão "script normal", sem módulos) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- 2. Carrega o teu cliente (tem de vir DEPOIS da linha acima) -->
+  <script src="supabaseClient.js"></script>
+
+  <!-- 3. A lógica desta página específica -->
+  <script>
+    init();
+
+    async function terminarSessao() {
+      await supabaseClient.auth.signOut();
+      window.location.href = 'login.html';
+    }
+
+    async function init() {
+      const user = await exigirSessao();
+      if (!user) return; // exigirSessao já redireciona para login.html
+
+      const participante = await getParticipanteAtual(user);
+      if (!participante) {
+        document.getElementById('estado-carregamento').textContent =
+          'Não foi possível carregar os teus dados. Contacta a organização.';
+        return;
+      }
+
+      renderSaudacao(participante);
+      renderEssencial(participante);
+
+      const atividadesHoje = await getAtividadesDeHoje();
+      renderAgenda(atividadesHoje);
+      renderProximaAtividade(atividadesHoje);
+
+      document.getElementById('estado-carregamento').style.display = 'none';
+      document.getElementById('conteudo').style.display = 'block';
+
+      document.getElementById('botao-sair').addEventListener('click', async () => {
+        await supabaseClient.auth.signOut();
+        window.location.href = 'login.html';
+      });
+    }
+
+    function renderSaudacao(p) {
+      const hora = new Date().getHours();
+      const cumprimento = hora < 12 ? 'Bom dia' : hora < 20 ? 'Boa tarde' : 'Boa noite';
+      document.getElementById('saudacao').textContent = `${cumprimento}, ${p.nome.split(' ')[0]} 👋`;
+      document.getElementById('subtitulo').textContent = 'Aqui tens o resumo do teu dia no JENC.';
+    }
+
+    function renderEssencial(p) {
+      document.getElementById('info-alojamento').textContent = p.nome_alojamento ?? '—';
+      document.getElementById('info-quarto').textContent = p.numero_quarto ?? '—';
+      document.getElementById('info-refeicao').textContent = p.turno_refeicao ?? '—';
+      document.getElementById('info-universidade').textContent = p.universidade ?? '—';
+    }
+
+    async function getAtividadesDeHoje() {
+      const hoje = new Date().toISOString().split('T')[0]; // "YYYY-MM-DD"
+
+      const { data, error } = await supabaseClient
+        .from('atividades')
+        .select('id, nome, data, hora_inicio, hora_fim, local, local_id')
+        .eq('data', hoje)
+        .order('hora_inicio', { ascending: true });
+
+      if (error) {
+        console.error('Erro ao ir buscar atividades:', error);
+        return [];
+      }
+      return data;
+    }
+
+    function renderAgenda(atividades) {
+      const container = document.getElementById('lista-agenda');
+      container.innerHTML = '';
+
+      if (atividades.length === 0) {
+        container.innerHTML = '<div class="card">Sem atividades agendadas para hoje.</div>';
+        return;
+      }
+
+      atividades.forEach(a => {
+        const item = document.createElement('div');
+        item.className = 'card agenda-item';
+        item.innerHTML = `
+          <div class="hora">${a.hora_inicio?.slice(0,5) ?? '--:--'}</div>
+          <div class="info">
+            <div class="nome">${a.nome}</div>
+            <div class="local">📍 ${a.local ?? 'Local a anunciar'}</div>
+            ${a.local_id ? `<a href="mapa.html?local=${a.local_id}" style="font-size:12px; color:var(--accent); text-decoration:none;">Ver no mapa →</a>` : ''}
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function renderProximaAtividade(atividadesHoje) {
+      const agora = new Date();
+
+      const proxima = atividadesHoje.find(a => {
+        const inicio = new Date(`${a.data}T${a.hora_inicio}`);
+        return inicio > agora;
+      });
+
+      const bloco = document.getElementById('bloco-proxima-atividade');
+
+      if (!proxima) {
+        bloco.innerHTML = '<div class="tag">SEM MAIS ATIVIDADES HOJE</div><h2>Até amanhã 👋</h2>';
+        return;
+      }
+
+      const inicio = new Date(`${proxima.data}T${proxima.hora_inicio}`);
+      const minutosRestantes = Math.round((inicio - agora) / 60000);
+
+      document.getElementById('pa-nome').textContent = proxima.nome;
+      document.getElementById('pa-local').textContent = proxima.local ?? 'Local a anunciar';
+      document.getElementById('pa-hora').textContent = proxima.hora_inicio?.slice(0,5);
+      document.getElementById('pa-countdown').textContent =
+        minutosRestantes <= 0
+          ? 'A começar agora'
+          : minutosRestantes < 60
+            ? `Começa dentro de ${minutosRestantes} min`
+            : `Começa às ${proxima.hora_inicio?.slice(0,5)}`;
+
+      const elLinkMapa = document.getElementById('pa-ver-mapa');
+      if (proxima.local_id) {
+        elLinkMapa.href = `mapa.html?local=${proxima.local_id}`;
+        elLinkMapa.style.display = 'inline-block';
+      } else {
+        elLinkMapa.style.display = 'none';
+      }
+    }
+  </script>
+
+</body>
+</html>

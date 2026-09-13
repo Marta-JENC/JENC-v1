@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mapa — JENC</title>
+<style>
+  :root {
+    --bg: #0F1B2B;
+    --card: #16263D;
+    --accent: #FF7A45;
+    --text: #F2F4F7;
+    --muted: #8FA0B8;
+    --border: #23374F;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 20px 16px 90px;
+    max-width: 480px;
+    margin-inline: auto;
+  }
+  .voltar {
+    display: inline-block;
+    color: var(--muted);
+    font-size: 13px;
+    text-decoration: none;
+    margin-bottom: 14px;
+  }
+  h1 { font-size: 22px; margin: 0 0 18px; }
+
+  .abas-pisos {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    margin-bottom: 16px;
+  }
+  .aba-piso {
+    flex-shrink: 0;
+    padding: 10px 16px;
+    border-radius: 10px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .aba-piso.ativa {
+    background: var(--accent);
+    color: #201007;
+    border-color: var(--accent);
+  }
+
+  .mapa-imagem {
+    position: relative;
+    width: 100%;
+    padding-bottom: 120%;
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--card);
+    border: 1px solid var(--border);
+    margin-bottom: 14px;
+  }
+  .mapa-imagem.sem-imagem {
+    background-image:
+      repeating-linear-gradient(45deg, #1c2e46 0, #1c2e46 12px, #16263D 12px, #16263D 24px);
+    border-style: dashed;
+  }
+  .mapa-imagem img {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+  .aviso-placeholder {
+    position: absolute; top: 10px; left: 10px; right: 10px;
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+    background: rgba(15,27,43,0.75);
+    padding: 6px 10px;
+    border-radius: 8px;
+  }
+
+  .pin {
+    position: absolute;
+    width: 16px; height: 16px;
+    background: var(--accent);
+    border: 2px solid #201007;
+    border-radius: 50% 50% 50% 0;
+    transform: translate(-50%, -100%) rotate(-45deg);
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  }
+  .pin.destaque {
+    background: #7CD992;
+    animation: pulsar 1.2s ease-in-out infinite;
+  }
+  @keyframes pulsar {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(124,217,146,0.5); }
+    50% { box-shadow: 0 0 0 10px rgba(124,217,146,0); }
+  }
+
+  .painel-detalhe {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 16px;
+    display: none;
+  }
+  .painel-detalhe .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    background: #FF7A4520;
+    padding: 3px 8px;
+    border-radius: 999px;
+    margin-bottom: 8px;
+  }
+  .painel-detalhe .nome { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+  .painel-detalhe .descricao { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+  section h3 { font-size: 13px; color: var(--muted); margin: 20px 0 10px; font-weight: 600; }
+  .item-local-sem-pin {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .item-local-sem-pin .nome { font-weight: 500; }
+  .item-local-sem-pin .tipo { color: var(--muted); font-size: 11px; }
+
+  .vazio, .carregamento {
+    text-align: center;
+    color: var(--muted);
+    padding: 40px 0;
+    font-size: 14px;
+  }
+</style>
+</head>
+<body>
+
+  <a class="voltar" href="inicio.html" id="link-voltar" onclick="return voltarInteligente(event)">← Voltar</a>
+  <h1>Mapa do recinto</h1>
+
+  <div id="abas-pisos" class="abas-pisos"></div>
+
+  <div id="mapa-imagem-container"></div>
+
+  <div class="painel-detalhe" id="painel-detalhe">
+    <div class="tag" id="pd-tipo">—</div>
+    <div class="nome" id="pd-nome">—</div>
+    <div class="descricao" id="pd-descricao"></div>
+  </div>
+
+  <div id="secao-sem-pin"></div>
+
+  <div class="carregamento" id="carregamento">A carregar mapa…</div>
+
+  <!-- 1. Biblioteca do Supabase como script normal (não é módulo) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- 2. O teu cliente Supabase -->
+  <script src="supabaseClient.js"></script>
+
+  <script>
+    // Volta para a página de onde vieste (staff ou participante) em vez
+    // de assumires sempre "inicio.html". Se não houver histórico (ex:
+    // abriste o mapa.html diretamente), cai para trás no href normal.
+    function voltarInteligente(evento) {
+      if (window.history.length > 1) {
+        evento.preventDefault();
+        window.history.back();
+        return false;
+      }
+      return true; // sem histórico: segue o href normal (inicio.html)
+    }
+
+    let pisos = [];
+    let locaisPorPiso = {}; // { piso_id: [ {...}, {...} ] }
+    let pisoSelecionado = null;
+    let localAlvoId = null; // vindo de ?local=
+
+    init();
+
+    async function init() {
+      const user = await exigirSessao();
+      if (!user) return;
+
+      const params = new URLSearchParams(window.location.search);
+      localAlvoId = params.get('local');
+
+      pisos = await getPisos();
+
+      if (pisos.length === 0) {
+        document.getElementById('carregamento').textContent =
+          'Ainda não há pisos configurados. Contacta a organização.';
+        return;
+      }
+
+      const locais = await getLocais();
+      agruparPorPiso(locais);
+
+      // Se veio de um "Ver no mapa", seleciona o piso desse local.
+      // Senão, o primeiro piso por ordem.
+      if (localAlvoId) {
+        const local = locais.find(l => l.id === localAlvoId);
+        pisoSelecionado = local?.piso_id ?? pisos[0].id;
+      } else {
+        pisoSelecionado = pisos[0].id;
+      }
+
+      renderAbasPisos();
+      renderPiso(pisoSelecionado);
+
+      document.getElementById('carregamento').style.display = 'none';
+    }
+
+    async function getPisos() {
+      const { data, error } = await supabaseClient
+        .from('pisos')
+        .select('id, nome, ordem, imagem_url')
+        .order('ordem', { ascending: true });
+
+      if (error) {
+        console.error('Erro ao ir buscar pisos:', error.message, error.details, error.hint);
+        return [];
+      }
+      return data;
+    }
+
+    async function getLocais() {
+      const { data, error } = await supabaseClient
+        .from('locais')
+        .select('id, nome, tipo, descricao, coordenadas, piso_id')
+        .order('nome', { ascending: true });
+
+      if (error) {
+        console.error('Erro ao ir buscar locais:', error.message, error.details, error.hint);
+        return [];
+      }
+      return data ?? [];
+    }
+
+    function agruparPorPiso(locais) {
+      locaisPorPiso = {};
+      locais.forEach(l => {
+        const chave = l.piso_id ?? 'sem-piso';
+        if (!locaisPorPiso[chave]) locaisPorPiso[chave] = [];
+        locaisPorPiso[chave].push(l);
+      });
+    }
+
+    function renderAbasPisos() {
+      const container = document.getElementById('abas-pisos');
+      container.innerHTML = '';
+
+      pisos.forEach(p => {
+        const aba = document.createElement('div');
+        aba.className = 'aba-piso' + (p.id === pisoSelecionado ? ' ativa' : '');
+        aba.textContent = p.nome;
+        aba.onclick = () => {
+          pisoSelecionado = p.id;
+          renderAbasPisos();
+          renderPiso(p.id);
+        };
+        container.appendChild(aba);
+      });
+    }
+
+    function renderPiso(pisoId) {
+      const piso = pisos.find(p => p.id === pisoId);
+      const locais = locaisPorPiso[pisoId] ?? [];
+      const comPin = locais.filter(l => l.coordenadas && typeof l.coordenadas.x === 'number' && typeof l.coordenadas.y === 'number');
+      const semPin = locais.filter(l => !comPin.includes(l));
+
+      // Imagem / placeholder
+      const container = document.getElementById('mapa-imagem-container');
+      container.innerHTML = '';
+
+      const mapaDiv = document.createElement('div');
+      mapaDiv.className = 'mapa-imagem' + (piso?.imagem_url ? '' : ' sem-imagem');
+      mapaDiv.id = 'mapa-imagem';
+
+      if (piso?.imagem_url) {
+        const img = document.createElement('img');
+        img.src = piso.imagem_url;
+        img.alt = `Planta — ${piso.nome}`;
+        mapaDiv.appendChild(img);
+      } else {
+        const aviso = document.createElement('div');
+        aviso.className = 'aviso-placeholder';
+        aviso.textContent = 'Planta ainda não disponível — os pins já mostram a posição relativa.';
+        mapaDiv.appendChild(aviso);
+      }
+
+      comPin.forEach(local => {
+        const pin = document.createElement('div');
+        pin.className = 'pin' + (local.id === localAlvoId ? ' destaque' : '');
+        pin.style.left = local.coordenadas.x + '%';
+        pin.style.top = local.coordenadas.y + '%';
+        pin.title = local.nome;
+        pin.onclick = () => mostrarDetalhe(local, piso);
+        mapaDiv.appendChild(pin);
+      });
+
+      container.appendChild(mapaDiv);
+
+      // Lista de locais deste piso sem posição ainda definida
+      const secaoSemPin = document.getElementById('secao-sem-pin');
+      secaoSemPin.innerHTML = '';
+      if (semPin.length > 0) {
+        const titulo = document.createElement('h3');
+        titulo.textContent = 'Outros locais neste piso (sem posição no mapa ainda)';
+        secaoSemPin.appendChild(titulo);
+
+        semPin.forEach(local => {
+          const item = document.createElement('div');
+          item.className = 'item-local-sem-pin';
+          item.innerHTML = `
+            <span class="nome">${local.nome}</span>
+            <span class="tipo">${local.tipo ?? ''}</span>
+          `;
+          item.onclick = () => mostrarDetalhe(local, piso);
+          item.style.cursor = 'pointer';
+          secaoSemPin.appendChild(item);
+        });
+      }
+
+      // Se o local-alvo (vindo de "Ver no mapa") está neste piso, mostra já o detalhe
+      if (localAlvoId) {
+        const alvo = locais.find(l => l.id === localAlvoId);
+        if (alvo) {
+          mostrarDetalhe(alvo, piso);
+          document.getElementById('mapa-imagem').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      } else {
+        document.getElementById('painel-detalhe').style.display = 'none';
+      }
+    }
+
+    function mostrarDetalhe(local, piso) {
+      document.getElementById('pd-tipo').textContent = `${piso?.nome ?? ''}${local.tipo ? ' · ' + local.tipo : ''}`;
+      document.getElementById('pd-nome').textContent = local.nome;
+      document.getElementById('pd-descricao').textContent = local.descricao ?? '';
+      document.getElementById('painel-detalhe').style.display = 'block';
+    }
+  </script>
+
+</body>
+</html>

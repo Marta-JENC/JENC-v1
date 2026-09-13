@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Refeições — JENC</title>
+<style>
+  :root {
+    --bg: #0F1B2B;
+    --card: #16263D;
+    --accent: #FF7A45;
+    --text: #F2F4F7;
+    --muted: #8FA0B8;
+    --border: #23374F;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 20px 16px 90px;
+    max-width: 480px;
+    margin-inline: auto;
+  }
+  .voltar {
+    display: inline-block;
+    color: var(--muted);
+    font-size: 13px;
+    text-decoration: none;
+    margin-bottom: 14px;
+  }
+  h1 { font-size: 22px; margin: 0 0 20px; }
+
+  .cartao-principal {
+    background: linear-gradient(135deg, var(--accent), #FF9466);
+    border-radius: 16px;
+    padding: 22px;
+    color: #201007;
+    margin-bottom: 24px;
+  }
+  .cartao-principal .tag { font-size: 12px; font-weight: 600; opacity: 0.75; }
+  .cartao-principal h2 { font-size: 22px; margin: 6px 0 10px; }
+  .cartao-principal .linha { font-size: 14px; display: flex; gap: 6px; align-items: center; margin-bottom: 4px; }
+
+  section h3 { font-size: 13px; color: var(--muted); margin: 0 0 10px; font-weight: 600; }
+  .item-turno {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .item-turno.meu { border-color: var(--accent); }
+  .item-turno .nome { font-size: 14px; font-weight: 600; }
+  .item-turno .local { font-size: 12px; color: var(--muted); }
+  .item-turno .hora { font-size: 13px; color: var(--accent); font-weight: 600; }
+
+  .estado { text-align: center; color: var(--muted); padding: 40px 0; font-size: 14px; }
+</style>
+</head>
+<body>
+
+  <a class="voltar" href="inicio.html">← Início</a>
+  <h1>Refeições</h1>
+
+  <div id="conteudo" style="display:none;">
+    <div class="cartao-principal" id="bloco-meu-turno">
+      <div class="tag">O TEU TURNO</div>
+      <h2 id="meu-turno-nome">—</h2>
+      <div class="linha">🕐 <span id="meu-turno-hora">—</span></div>
+      <div class="linha">📍 <span id="meu-turno-local">—</span></div>
+    </div>
+
+    <section>
+      <h3>Todos os turnos</h3>
+      <div id="lista-turnos"></div>
+    </section>
+  </div>
+
+  <div class="estado" id="carregamento">A carregar…</div>
+
+  <!-- 1. Biblioteca do Supabase como script normal (não é módulo) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- 2. O teu cliente Supabase -->
+  <script src="supabaseClient.js"></script>
+
+  <script>
+    init();
+
+    async function init() {
+      const user = await exigirSessao();
+      if (!user) return;
+
+      const participante = await getParticipanteAtual(user);
+      if (!participante) {
+        document.getElementById('carregamento').textContent =
+          'Não foi possível carregar os teus dados. Contacta a organização.';
+        return;
+      }
+
+      const turnos = await getTodosOsTurnos();
+      renderListaTurnos(turnos, participante.turno_refeicao);
+      renderMeuTurno(turnos, participante.turno_refeicao);
+
+      document.getElementById('carregamento').style.display = 'none';
+      document.getElementById('conteudo').style.display = 'block';
+    }
+
+    async function getTodosOsTurnos() {
+      const { data, error } = await supabaseClient
+        .from('turnos_refeicao')
+        .select('id, nome, hora_inicio, hora_fim, local')
+        .order('hora_inicio', { ascending: true });
+
+      if (error) {
+        console.error('Erro ao ir buscar turnos:', error.message, error.details, error.hint);
+        return [];
+      }
+      return data;
+    }
+
+    function renderMeuTurno(turnos, nomeDoMeuTurno) {
+      const bloco = document.getElementById('bloco-meu-turno');
+
+      if (!nomeDoMeuTurno) {
+        bloco.innerHTML = '<div class="tag">O TEU TURNO</div><h2>Ainda não atribuído</h2><div class="linha">A organização vai atualizar isto em breve.</div>';
+        return;
+      }
+
+      const turno = turnos.find(t => t.nome === nomeDoMeuTurno);
+
+      document.getElementById('meu-turno-nome').textContent = nomeDoMeuTurno;
+      document.getElementById('meu-turno-hora').textContent = turno
+        ? `${turno.hora_inicio.slice(0,5)} – ${turno.hora_fim.slice(0,5)}`
+        : 'Horário a anunciar';
+      document.getElementById('meu-turno-local').textContent = turno?.local ?? 'Local a anunciar';
+    }
+
+    function renderListaTurnos(turnos, nomeDoMeuTurno) {
+      const container = document.getElementById('lista-turnos');
+      container.innerHTML = '';
+
+      if (turnos.length === 0) {
+        container.innerHTML = '<div class="estado">Ainda não há turnos publicados.</div>';
+        return;
+      }
+
+      turnos.forEach(t => {
+        const item = document.createElement('div');
+        item.className = 'item-turno' + (t.nome === nomeDoMeuTurno ? ' meu' : '');
+        item.innerHTML = `
+          <div>
+            <div class="nome">${t.nome}${t.nome === nomeDoMeuTurno ? ' (o teu)' : ''}</div>
+            <div class="local">📍 ${t.local ?? 'Local a anunciar'}</div>
+          </div>
+          <div class="hora">${t.hora_inicio.slice(0,5)} – ${t.hora_fim.slice(0,5)}</div>
+        `;
+        container.appendChild(item);
+      });
+    }
+  </script>
+
+</body>
+</html>
