@@ -4,21 +4,38 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gamificação — JENC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0F1B2B;
-    --card: #16263D;
-    --accent: #FF7A45;
-    --text: #F2F4F7;
-    --muted: #8FA0B8;
-    --border: #23374F;
+    --bg: #0A1B2E;
+    --card: rgba(18, 40, 63, 0.82);
+    --accent: #D4A94A;
+    --text: #F4F0E4;
+    --muted: #7E97B0;
+    --border: #1F3B57;
     --sucesso: #7CD992;
     --erro: #FF6B6B;
   }
   * { box-sizing: border-box; }
+  .fundo-foto {
+    position: fixed; inset: 0; z-index: -2;
+    background-image: url("lisboa-simples.jpg");
+    background-size: cover;
+    background-position: center 55%;
+  }
+  .fundo-veu {
+    position: fixed; inset: 0; z-index: -1;
+    background: linear-gradient(180deg, rgba(10,27,46,0.55) 0%, rgba(10,27,46,0.72) 55%, rgba(10,27,46,0.88) 100%);
+  }
+  .card, [class*="card"], [class*="item-"], [class*="cartao"], [class*="aba"], .painel-detalhe, input {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+  h1, h2 { font-family: 'Fraunces', Georgia, serif; font-weight: 600; letter-spacing: -0.01em; }
   body {
     margin: 0;
-    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-family: 'Manrope', 'Segoe UI', system-ui, sans-serif;
     background: var(--bg);
     color: var(--text);
     padding: 20px 16px 90px;
@@ -35,10 +52,10 @@
   h1 { font-size: 22px; margin: 0 0 18px; }
 
   .cartao-pontos {
-    background: linear-gradient(135deg, var(--accent), #FF9466);
+    background: linear-gradient(135deg, var(--accent), #E8C873);
     border-radius: 16px;
     padding: 20px;
-    color: #201007;
+    color: #0A1B2E;
     margin-bottom: 20px;
     display: flex;
     justify-content: space-between;
@@ -65,7 +82,7 @@
     font-weight: 600;
     cursor: pointer;
   }
-  .aba-secao.ativa { background: var(--accent); color: #201007; border-color: var(--accent); }
+  .aba-secao.ativa { background: var(--accent); color: #0A1B2E; border-color: var(--accent); }
 
   .secao { display: none; }
   .secao.ativa { display: block; }
@@ -83,7 +100,7 @@
   .badge-pontos {
     flex-shrink: 0;
     font-size: 11px; font-weight: 700;
-    background: #FF7A4520; color: var(--accent);
+    background: #D4A94A20; color: var(--accent);
     padding: 3px 9px; border-radius: 999px;
     white-space: nowrap;
   }
@@ -111,7 +128,7 @@
   }
   .botao-submeter {
     width: 100%; padding: 11px; border: none; border-radius: 8px;
-    background: var(--accent); color: #201007; font-weight: 700; font-size: 13px; cursor: pointer;
+    background: var(--accent); color: #0A1B2E; font-weight: 700; font-size: 13px; cursor: pointer;
   }
   .botao-submeter:disabled { opacity: 0.6; cursor: default; }
 
@@ -150,7 +167,7 @@
     padding: 10px 14px;
     margin-bottom: 8px;
   }
-  .linha-leaderboard.eu { border-color: var(--accent); background: #FF7A4515; }
+  .linha-leaderboard.eu { border-color: var(--accent); background: #D4A94A15; }
   .linha-leaderboard .posicao-num {
     width: 26px; text-align: center; font-weight: 800; color: var(--muted); font-size: 14px;
   }
@@ -166,6 +183,8 @@
 </style>
 </head>
 <body>
+  <div class="fundo-foto" aria-hidden="true"></div>
+  <div class="fundo-veu" aria-hidden="true"></div>
 
   <a class="voltar" href="inicio.html">← Início</a>
   <h1>Gamificação</h1>

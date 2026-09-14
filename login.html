@@ -4,54 +4,80 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Entrar — JENC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0F1B2B;
-    --card: #16263D;
-    --accent: #FF7A45;
-    --text: #F2F4F7;
-    --muted: #8FA0B8;
-    --border: #23374F;
+    --bg: #0A1B2E;
+    --card: rgba(18, 40, 63, 0.72);
+    --accent: #D4A94A;
+    --text: #F4F0E4;
+    --muted: #C9D6E5;
+    --border: rgba(212, 169, 74, 0.35);
     --erro: #FF6B6B;
   }
   * { box-sizing: border-box; }
+  h1, h2 { font-family: 'Fraunces', Georgia, serif; font-weight: 600; letter-spacing: -0.01em; }
+
+  .fundo-foto {
+    position: fixed; inset: 0; z-index: -2;
+    background-image: url("lisboa-azulejo.jpg");
+    background-size: cover;
+    background-position: center 35%;
+  }
+  .fundo-veu {
+    position: fixed; inset: 0; z-index: -1;
+    background: linear-gradient(180deg, rgba(10,27,46,0.78) 0%, rgba(10,27,46,0.55) 45%, rgba(10,27,46,0.85) 100%);
+  }
+  .faixa-topo {
+    position: fixed; top: 0; left: 0; right: 0; height: 4px; z-index: 3;
+    background: linear-gradient(90deg, #8A6A22, var(--accent) 25%, #E8C873 50%, var(--accent) 75%, #8A6A22);
+  }
+
   body {
     margin: 0;
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-family: 'Manrope', 'Segoe UI', system-ui, sans-serif;
     background: var(--bg);
     color: var(--text);
     padding: 20px;
+    position: relative;
   }
   .caixa {
     width: 100%;
     max-width: 380px;
+    position: relative;
+    z-index: 2;
+    background: var(--card);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 28px 26px;
   }
-  h1 { font-size: 24px; margin: 0 0 6px; }
-  .sub { color: var(--muted); font-size: 14px; margin: 0 0 28px; }
-
-  .abas { display: flex; gap: 8px; margin-bottom: 20px; }
-  .aba {
-    flex: 1; text-align: center; padding: 10px; border-radius: 10px;
-    background: var(--card); border: 1px solid var(--border);
-    color: var(--muted); font-size: 14px; cursor: pointer; user-select: none;
+  .marca { text-align: center; margin-bottom: 6px; }
+  .marca .jenc { font-size: 34px; letter-spacing: 0.02em; }
+  .marca .tema {
+    font-family: 'Fraunces', Georgia, serif; font-style: italic; font-weight: 500;
+    color: var(--accent); font-size: 15px; margin-top: 2px;
   }
-  .aba.ativa { background: var(--accent); color: #201007; font-weight: 600; border-color: var(--accent); }
+  h1 { font-size: 24px; margin: 0 0 6px; text-align: center; }
+  .sub { color: var(--muted); font-size: 14px; margin: 0 0 28px; text-align: center; }
 
   label { font-size: 13px; color: var(--muted); display: block; margin: 14px 0 6px; }
   input {
     width: 100%; padding: 12px 14px; border-radius: 10px;
-    border: 1px solid var(--border); background: var(--card); color: var(--text);
+    border: 1px solid var(--border); background: rgba(10,27,46,0.55); color: var(--text);
     font-size: 14px;
   }
   input:focus { outline: none; border-color: var(--accent); }
 
   button.principal {
     width: 100%; margin-top: 22px; padding: 13px; border: none; border-radius: 10px;
-    background: var(--accent); color: #201007; font-size: 15px; font-weight: 600; cursor: pointer;
+    background: var(--accent); color: #0A1B2E; font-size: 15px; font-weight: 600; cursor: pointer;
   }
   button.principal:disabled { opacity: 0.6; cursor: default; }
 
@@ -62,8 +88,15 @@
 </head>
 <body>
 
+  <div class="fundo-foto" aria-hidden="true"></div>
+  <div class="fundo-veu" aria-hidden="true"></div>
+  <div class="faixa-topo" aria-hidden="true"></div>
+
   <div class="caixa">
-    <h1>JENC</h1>
+    <div class="marca">
+      <h1 class="jenc">JENC</h1>
+      <div class="tema">Futuro sobre o Tejo</div>
+    </div>
     <p class="sub">Entra com a tua conta (participante ou staff).</p>
 
     <label for="email">Email</label>

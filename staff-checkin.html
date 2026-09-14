@@ -4,21 +4,38 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Check-in — Staff JENC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0F1B2B;
-    --card: #16263D;
-    --accent: #FF7A45;
-    --text: #F2F4F7;
-    --muted: #8FA0B8;
-    --border: #23374F;
+    --bg: #0A1B2E;
+    --card: rgba(18, 40, 63, 0.82);
+    --accent: #D4A94A;
+    --text: #F4F0E4;
+    --muted: #7E97B0;
+    --border: #1F3B57;
     --erro: #FF6B6B;
     --sucesso: #7CD992;
   }
   * { box-sizing: border-box; }
+  .fundo-foto {
+    position: fixed; inset: 0; z-index: -2;
+    background-image: url("lisboa-simples.jpg");
+    background-size: cover;
+    background-position: center 55%;
+  }
+  .fundo-veu {
+    position: fixed; inset: 0; z-index: -1;
+    background: linear-gradient(180deg, rgba(10,27,46,0.55) 0%, rgba(10,27,46,0.72) 55%, rgba(10,27,46,0.88) 100%);
+  }
+  .card, [class*="card"], [class*="item-"], [class*="cartao"], [class*="aba"], .painel-detalhe, [class*="campo"], input, .rotulo-funcao {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+  h1, h2 { font-family: 'Fraunces', Georgia, serif; font-weight: 600; letter-spacing: -0.01em; }
   body {
     margin: 0;
-    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-family: 'Manrope', 'Segoe UI', system-ui, sans-serif;
     background: var(--bg);
     color: var(--text);
     padding: 20px 16px 90px;
@@ -71,7 +88,7 @@
     border-radius: 10px;
     border: none;
     background: var(--accent);
-    color: #201007;
+    color: #0A1B2E;
     font-weight: 600;
     cursor: pointer;
   }
@@ -116,7 +133,7 @@
     background: var(--bg); border: 1px solid var(--border); color: var(--muted);
     font-size: 12px; cursor: pointer;
   }
-  .tipo-opcao.ativo { background: var(--accent); color: #201007; border-color: var(--accent); font-weight: 600; }
+  .tipo-opcao.ativo { background: var(--accent); color: #0A1B2E; border-color: var(--accent); font-weight: 600; }
   .linha-acoes { display: flex; gap: 8px; }
   .botao-acao {
     flex: 1; padding: 12px; border-radius: 10px; border: none;
@@ -126,9 +143,43 @@
   .botao-acao.saida { background: var(--erro); color: #3a0b0b; }
 
   .estado-carregamento { text-align: center; color: var(--muted); padding: 40px 0; font-size: 14px; }
+
+  .secao-extra { margin-top: 14px; }
+  .botao-secao-extra {
+    width: 100%; text-align: left; padding: 12px 14px; border-radius: 10px;
+    border: 1px solid var(--border); background: var(--card); color: var(--text);
+    font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  .painel-secao-extra { display: none; margin-top: 8px; }
+  .painel-secao-extra.aberto { display: block; }
+
+  .linha-recente {
+    display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+    padding: 10px 12px; margin-bottom: 6px; font-size: 13px;
+  }
+  .linha-recente .detalhe-recente { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .linha-recente .tag-acao {
+    font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 999px; margin-right: 6px;
+  }
+  .linha-recente .tag-acao.entrada { background: var(--sucesso); color: #08331a; }
+  .linha-recente .tag-acao.saida { background: var(--erro); color: #3a0b0b; }
+  .botao-anular {
+    flex-shrink: 0; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--erro);
+    background: none; color: var(--erro); font-size: 11px; font-weight: 700; cursor: pointer;
+  }
+
+  .cabecalho-faltam { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 12px; color: var(--muted); }
+  .lista-faltam { max-height: 320px; overflow-y: auto; }
+  .item-falta {
+    background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+    padding: 8px 12px; margin-bottom: 6px; font-size: 13px;
+  }
 </style>
 </head>
 <body>
+  <div class="fundo-foto" aria-hidden="true"></div>
+  <div class="fundo-veu" aria-hidden="true"></div>
 
   <header>
     <div>
@@ -137,9 +188,6 @@
     </div>
     <div style="display:flex; gap:8px;">
       <a href="staff-inicio.html" style="background:none; border:1px solid var(--border); color:var(--muted); font-size:14px; padding:6px 10px; border-radius:8px; text-decoration:none;" title="Início">🏠</a>
-      <a href="staff-horario.html" style="background:none; border:1px solid var(--border); color:var(--muted); font-size:14px; padding:6px 10px; border-radius:8px; text-decoration:none;" title="O Meu Horário">🕓</a>
-      <a href="staff-equipa.html" style="background:none; border:1px solid var(--border); color:var(--muted); font-size:14px; padding:6px 10px; border-radius:8px; text-decoration:none;" title="Equipa">👥</a>
-      <a href="staff-atividades.html" style="background:none; border:1px solid var(--border); color:var(--muted); font-size:14px; padding:6px 10px; border-radius:8px; text-decoration:none;" title="Atividades">🗓️</a>
       <button class="sair" onclick="terminarSessaoStaff()">Sair</button>
     </div>
   </header>
@@ -174,7 +222,8 @@
       <div class="linha-tipo">
         <div class="tipo-opcao ativo" data-tipo="evento" onclick="escolherTipo('evento')">Evento</div>
         <div class="tipo-opcao" data-tipo="alojamento" onclick="escolherTipo('alojamento')">Alojamento</div>
-        <div class="tipo-opcao" data-tipo="refeicao" onclick="escolherTipo('refeicao')">Refeição</div>
+        <div class="tipo-opcao" data-tipo="almoco" onclick="escolherTipo('almoco')">Almoço</div>
+        <div class="tipo-opcao" data-tipo="jantar" onclick="escolherTipo('jantar')">Jantar</div>
       </div>
       <div id="tipo-confirmado" style="font-size:12px; color: var(--accent); margin-bottom:14px;">Tipo selecionado: Evento</div>
 
@@ -184,6 +233,16 @@
         <button class="botao-acao saida" onclick="registarCheckin('saida')">✕ Saída</button>
       </div>
     </div>
+  </div>
+
+  <div class="secao-extra">
+    <button class="botao-secao-extra" onclick="alternarSecao('recentes')">🕓 Correções recentes (anular um check-in) ▾</button>
+    <div class="painel-secao-extra" id="painel-recentes"></div>
+  </div>
+
+  <div class="secao-extra">
+    <button class="botao-secao-extra" onclick="alternarSecao('faltam')">❗ Quem falta registar ▾</button>
+    <div class="painel-secao-extra" id="painel-faltam"></div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -318,7 +377,7 @@
       document.getElementById('cartao-perfil').style.display = 'block';
     }
 
-    const ROTULOS_TIPO = { evento: 'Evento', alojamento: 'Alojamento', refeicao: 'Refeição' };
+    const ROTULOS_TIPO = { evento: 'Evento', alojamento: 'Alojamento', almoco: 'Almoço', jantar: 'Jantar', refeicao: 'Refeição' };
 
     function escolherTipo(tipo) {
       tipoSelecionado = tipo;
@@ -326,6 +385,10 @@
         el.classList.toggle('ativo', el.dataset.tipo === tipo);
       });
       document.getElementById('tipo-confirmado').textContent = `Tipo selecionado: ${ROTULOS_TIPO[tipo]}`;
+
+      if (document.getElementById('painel-faltam').classList.contains('aberto')) {
+        carregarQuemFalta();
+      }
     }
 
     async function registarCheckin(acao) {
@@ -336,6 +399,8 @@
 
       const nomeParticipante = participanteAtual.nome;
 
+      console.log('A registar check-in com:', { participante_id: participanteAtual.id, lido_por: staffAtual.id, tipo: tipoSelecionado, acao });
+
       const { error } = await supabaseClient.from('checkins').insert({
         participante_id: participanteAtual.id,
         lido_por: staffAtual.id,
@@ -344,7 +409,8 @@
       });
 
       if (error) {
-        mostrarMensagem('Erro ao registar: ' + error.message, 'erro');
+        console.error('Erro ao registar check-in:', error);
+        mostrarMensagem('Erro ao registar: ' + error.message + (error.hint ? ' — ' + error.hint : ''), 'erro');
         return;
       }
 
@@ -358,6 +424,117 @@
       document.getElementById('cartao-perfil').style.display = 'none';
       document.getElementById('input-manual').value = '';
       escolherTipo('evento');
+
+      // Mantém a secção de correções recentes atualizada, se estiver aberta
+      // (a de "quem falta" já é atualizada dentro de escolherTipo('evento') acima)
+      if (document.getElementById('painel-recentes').classList.contains('aberto')) carregarRecentes();
+    }
+
+    // -----------------------------------------------------------------
+    // Correções recentes: mostra os últimos check-ins e deixa anular.
+    // -----------------------------------------------------------------
+    function alternarSecao(nome) {
+      const painel = document.getElementById(`painel-${nome}`);
+      const abrir = !painel.classList.contains('aberto');
+      painel.classList.toggle('aberto', abrir);
+      if (abrir && nome === 'recentes') carregarRecentes();
+      if (abrir && nome === 'faltam') carregarQuemFalta();
+    }
+
+    async function carregarRecentes() {
+      const painel = document.getElementById('painel-recentes');
+      painel.innerHTML = '<div class="estado-carregamento" style="padding:14px 0;">A carregar…</div>';
+
+      const { data, error } = await supabaseClient
+        .from('checkins')
+        .select('id, tipo, acao, criado_em, participantes(nome)')
+        .order('criado_em', { ascending: false })
+        .limit(15);
+
+      if (error) {
+        painel.innerHTML = '<div class="estado-carregamento" style="padding:14px 0;">Não foi possível carregar.</div>';
+        console.error('Erro ao ir buscar check-ins recentes:', error.message, error.details, error.hint);
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        painel.innerHTML = '<div class="estado-carregamento" style="padding:14px 0;">Ainda não há check-ins registados.</div>';
+        return;
+      }
+
+      painel.innerHTML = '';
+      data.forEach(c => {
+        const hora = new Date(c.criado_em).toLocaleString('pt-PT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+        const linha = document.createElement('div');
+        linha.className = 'linha-recente';
+        linha.innerHTML = `
+          <div>
+            <div><span class="tag-acao ${c.acao}">${c.acao === 'entrada' ? 'Entrada' : 'Saída'}</span>${c.participantes?.nome ?? 'Participante removido'}</div>
+            <div class="detalhe-recente">${ROTULOS_TIPO[c.tipo] ?? c.tipo} · ${hora}</div>
+          </div>
+          <button class="botao-anular" onclick="anularCheckin('${c.id}')">Anular</button>
+        `;
+        painel.appendChild(linha);
+      });
+    }
+
+    async function anularCheckin(checkinId) {
+      const { error } = await supabaseClient.from('checkins').delete().eq('id', checkinId);
+      if (error) {
+        mostrarMensagem('Erro ao anular: ' + error.message, 'erro');
+        return;
+      }
+      mostrarMensagem('Check-in anulado.', 'sucesso');
+      await carregarRecentes();
+      if (document.getElementById('painel-faltam').classList.contains('aberto')) carregarQuemFalta();
+    }
+
+    // -----------------------------------------------------------------
+    // Quem falta registar (para o tipo atualmente selecionado acima).
+    // -----------------------------------------------------------------
+    async function carregarQuemFalta() {
+      const painel = document.getElementById('painel-faltam');
+      painel.innerHTML = '<div class="estado-carregamento" style="padding:14px 0;">A carregar…</div>';
+
+      const { data: todos, error: erroTodos } = await supabaseClient
+        .from('participantes')
+        .select('id, nome')
+        .order('nome', { ascending: true });
+
+      const { data: jaFeitos, error: erroFeitos } = await supabaseClient
+        .from('checkins')
+        .select('participante_id')
+        .eq('tipo', tipoSelecionado)
+        .eq('acao', 'entrada');
+
+      if (erroTodos || erroFeitos) {
+        painel.innerHTML = '<div class="estado-carregamento" style="padding:14px 0;">Não foi possível carregar.</div>';
+        console.error('Erro ao ir buscar quem falta:', erroTodos || erroFeitos);
+        return;
+      }
+
+      const feitosSet = new Set((jaFeitos ?? []).map(c => c.participante_id));
+      const faltam = (todos ?? []).filter(p => !feitosSet.has(p.id));
+
+      painel.innerHTML = `
+        <div class="cabecalho-faltam">
+          <span>Faltam ${faltam.length} de ${todos.length} (${ROTULOS_TIPO[tipoSelecionado]})</span>
+        </div>
+        <div class="lista-faltam" id="lista-faltam"></div>
+      `;
+
+      const lista = document.getElementById('lista-faltam');
+      if (faltam.length === 0) {
+        lista.innerHTML = '<div class="item-falta">Toda a gente já está registada! 🎉</div>';
+        return;
+      }
+
+      faltam.forEach(p => {
+        const item = document.createElement('div');
+        item.className = 'item-falta';
+        item.textContent = p.nome;
+        lista.appendChild(item);
+      });
     }
 
     function mostrarMensagem(texto, tipo) {

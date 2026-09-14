@@ -4,21 +4,38 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Contactos — JENC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0F1B2B;
-    --card: #16263D;
-    --accent: #FF7A45;
-    --text: #F2F4F7;
-    --muted: #8FA0B8;
-    --border: #23374F;
+    --bg: #0A1B2E;
+    --card: rgba(18, 40, 63, 0.82);
+    --accent: #D4A94A;
+    --text: #F4F0E4;
+    --muted: #7E97B0;
+    --border: #1F3B57;
     --erro: #FF6B6B;
     --sucesso: #7CD992;
   }
   * { box-sizing: border-box; }
+  .fundo-foto {
+    position: fixed; inset: 0; z-index: -2;
+    background-image: url("lisboa-simples.jpg");
+    background-size: cover;
+    background-position: center 55%;
+  }
+  .fundo-veu {
+    position: fixed; inset: 0; z-index: -1;
+    background: linear-gradient(180deg, rgba(10,27,46,0.55) 0%, rgba(10,27,46,0.72) 55%, rgba(10,27,46,0.88) 100%);
+  }
+  .card, [class*="card"], [class*="item-"], [class*="cartao"], [class*="aba"], .painel-detalhe, input {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+  h1, h2 { font-family: 'Fraunces', Georgia, serif; font-weight: 600; letter-spacing: -0.01em; }
   body {
     margin: 0;
-    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-family: 'Manrope', 'Segoe UI', system-ui, sans-serif;
     background: var(--bg);
     color: var(--text);
     padding: 20px 16px 90px;
@@ -36,10 +53,10 @@
   .sub { color: var(--muted); font-size: 13px; margin: 0 0 18px; }
 
   .cartao-progresso {
-    background: linear-gradient(135deg, var(--accent), #FF9466);
+    background: linear-gradient(135deg, var(--accent), #E8C873);
     border-radius: 14px;
     padding: 16px 18px;
-    color: #201007;
+    color: #0A1B2E;
     margin-bottom: 18px;
     display: flex;
     justify-content: space-between;
@@ -73,7 +90,7 @@
   }
   .entrada-manual button {
     padding: 12px 18px; border-radius: 10px; border: none;
-    background: var(--accent); color: #201007; font-weight: 600; cursor: pointer;
+    background: var(--accent); color: #0A1B2E; font-weight: 600; cursor: pointer;
   }
 
   .mensagem { font-size: 13px; text-align: center; margin-bottom: 16px; min-height: 18px; }
@@ -110,6 +127,8 @@
 </style>
 </head>
 <body>
+  <div class="fundo-foto" aria-hidden="true"></div>
+  <div class="fundo-veu" aria-hidden="true"></div>
 
   <a class="voltar" href="inicio.html">← Início</a>
   <h1>Contactos</h1>

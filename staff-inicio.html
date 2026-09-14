@@ -4,19 +4,36 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Staff — JENC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0F1B2B;
-    --card: #16263D;
-    --accent: #FF7A45;
-    --text: #F2F4F7;
-    --muted: #8FA0B8;
-    --border: #23374F;
+    --bg: #0A1B2E;
+    --card: rgba(18, 40, 63, 0.82);
+    --accent: #D4A94A;
+    --text: #F4F0E4;
+    --muted: #7E97B0;
+    --border: #1F3B57;
   }
   * { box-sizing: border-box; }
+  .fundo-foto {
+    position: fixed; inset: 0; z-index: -2;
+    background-image: url("lisboa-simples.jpg");
+    background-size: cover;
+    background-position: center 55%;
+  }
+  .fundo-veu {
+    position: fixed; inset: 0; z-index: -1;
+    background: linear-gradient(180deg, rgba(10,27,46,0.55) 0%, rgba(10,27,46,0.72) 55%, rgba(10,27,46,0.88) 100%);
+  }
+  .card, [class*="card"], [class*="item-"], [class*="cartao"], [class*="aba"], .painel-detalhe, [class*="campo"], input, .rotulo-funcao {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+  h1, h2 { font-family: 'Fraunces', Georgia, serif; font-weight: 600; letter-spacing: -0.01em; }
   body {
     margin: 0;
-    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-family: 'Manrope', 'Segoe UI', system-ui, sans-serif;
     background: var(--bg);
     color: var(--text);
     padding: 24px 16px 90px;
@@ -32,15 +49,23 @@
   }
 
   .cartao-resumo {
-    background: linear-gradient(135deg, var(--accent), #FF9466);
+    background: linear-gradient(135deg, var(--accent), #E8C873);
     border-radius: 16px;
     padding: 20px;
-    color: #201007;
+    color: #0A1B2E;
     margin-bottom: 26px;
   }
   .cartao-resumo .tag { font-size: 12px; font-weight: 600; opacity: 0.75; }
   .cartao-resumo .numero { font-size: 28px; font-weight: 800; margin: 4px 0 2px; }
   .cartao-resumo .legenda { font-size: 13px; opacity: 0.85; }
+
+  .grid-resumo-secundario { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: -14px; margin-bottom: 26px; }
+  .card-resumo-mini {
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 12px 14px;
+  }
+  .card-resumo-mini .tag { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: 0.5px; }
+  .card-resumo-mini .numero { font-size: 18px; font-weight: 800; color: var(--accent); margin-top: 3px; }
 
   .grid-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .card-nav {
@@ -60,13 +85,18 @@
 </style>
 </head>
 <body>
+  <div class="fundo-foto" aria-hidden="true"></div>
+  <div class="fundo-veu" aria-hidden="true"></div>
 
   <header>
     <div>
       <h1 id="saudacao">Olá 👋</h1>
       <p id="subtitulo">A carregar…</p>
     </div>
-    <button class="sair" onclick="terminarSessaoStaff()">Sair</button>
+    <div style="display:flex; gap:8px;">
+      <button class="sair" onclick="atualizarAgora()" id="botao-atualizar">🔄 Atualizar</button>
+      <button class="sair" onclick="terminarSessaoStaff()">Sair</button>
+    </div>
   </header>
 
   <div id="conteudo" style="display:none;">
@@ -75,6 +105,17 @@
       <div class="tag">CHECK-INS NO EVENTO</div>
       <div class="numero" id="resumo-numero">—</div>
       <div class="legenda" id="resumo-legenda">a carregar…</div>
+    </div>
+
+    <div class="grid-resumo-secundario">
+      <div class="card-resumo-mini">
+        <div class="tag">ALOJAMENTO</div>
+        <div class="numero" id="resumo-alojamento">—</div>
+      </div>
+      <div class="card-resumo-mini">
+        <div class="tag">REFEIÇÃO</div>
+        <div class="numero" id="resumo-refeicao">—</div>
+      </div>
     </div>
 
     <div class="grid-nav">
@@ -98,6 +139,11 @@
         <div class="titulo">Equipa</div>
         <div class="descricao">Contactos de toda a equipa de staff.</div>
       </a>
+      <a href="staff-stock.html" class="card-nav">
+        <span class="icone">📦</span>
+        <div class="titulo">Stock</div>
+        <div class="descricao">Coffee breaks, almoço e jantar.</div>
+      </a>
     </div>
 
   </div>
@@ -110,6 +156,8 @@
   <script src="supabaseClient.js"></script>
 
   <script>
+    let intervaloAtualizacao = null;
+
     init();
 
     async function init() {
@@ -127,6 +175,19 @@
 
       document.getElementById('carregamento').style.display = 'none';
       document.getElementById('conteudo').style.display = 'block';
+
+      // Atualiza sozinho de vez em quando, para veres check-ins feitos
+      // por outros membros do staff sem teres de sair e voltar a entrar.
+      intervaloAtualizacao = setInterval(renderResumoCheckins, 15000);
+    }
+
+    async function atualizarAgora() {
+      const botao = document.getElementById('botao-atualizar');
+      botao.disabled = true;
+      botao.textContent = '🔄 A atualizar…';
+      await renderResumoCheckins();
+      botao.textContent = '🔄 Atualizar';
+      botao.disabled = false;
     }
 
     function renderSaudacao(staff) {
@@ -143,9 +204,9 @@
 
       const { data: entradas, error: erroEntradas } = await supabaseClient
         .from('checkins')
-        .select('participante_id')
-        .eq('tipo', 'evento')
-        .eq('acao', 'entrada');
+        .select('participante_id, tipo')
+        .eq('acao', 'entrada')
+        .in('tipo', ['evento', 'alojamento', 'almoco', 'jantar', 'refeicao']);
 
       if (erroTotal || erroEntradas) {
         console.error('Erro ao ir buscar resumo de check-ins:', erroTotal || erroEntradas);
@@ -153,13 +214,24 @@
         return;
       }
 
-      const distintos = new Set((entradas ?? []).map(e => e.participante_id)).size;
+      const distintosPorTipo = { evento: new Set(), alojamento: new Set(), refeicao: new Set() };
+      const TIPOS_REFEICAO = ['almoco', 'jantar', 'refeicao']; // junta as refeições todas num só número
+      (entradas ?? []).forEach(e => {
+        if (TIPOS_REFEICAO.includes(e.tipo)) {
+          distintosPorTipo.refeicao.add(e.participante_id);
+        } else if (distintosPorTipo[e.tipo]) {
+          distintosPorTipo[e.tipo].add(e.participante_id);
+        }
+      });
 
-      document.getElementById('resumo-numero').textContent = `${distintos} / ${totalParticipantes ?? '—'}`;
+      document.getElementById('resumo-numero').textContent = `${distintosPorTipo.evento.size} / ${totalParticipantes ?? '—'}`;
       document.getElementById('resumo-legenda').textContent = 'participantes já fizeram check-in ao evento';
+      document.getElementById('resumo-alojamento').textContent = `${distintosPorTipo.alojamento.size} / ${totalParticipantes ?? '—'}`;
+      document.getElementById('resumo-refeicao').textContent = `${distintosPorTipo.refeicao.size} / ${totalParticipantes ?? '—'}`;
     }
 
     async function terminarSessaoStaff() {
+      if (intervaloAtualizacao) clearInterval(intervaloAtualizacao);
       await supabaseClient.auth.signOut();
       window.location.href = 'login.html';
     }

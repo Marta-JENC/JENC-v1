@@ -4,19 +4,36 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mapa — JENC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0F1B2B;
-    --card: #16263D;
-    --accent: #FF7A45;
-    --text: #F2F4F7;
-    --muted: #8FA0B8;
-    --border: #23374F;
+    --bg: #0A1B2E;
+    --card: rgba(18, 40, 63, 0.82);
+    --accent: #D4A94A;
+    --text: #F4F0E4;
+    --muted: #7E97B0;
+    --border: #1F3B57;
   }
   * { box-sizing: border-box; }
+  .fundo-foto {
+    position: fixed; inset: 0; z-index: -2;
+    background-image: url("lisboa-simples.jpg");
+    background-size: cover;
+    background-position: center 55%;
+  }
+  .fundo-veu {
+    position: fixed; inset: 0; z-index: -1;
+    background: linear-gradient(180deg, rgba(10,27,46,0.55) 0%, rgba(10,27,46,0.72) 55%, rgba(10,27,46,0.88) 100%);
+  }
+  .card, [class*="card"], [class*="item-"], [class*="cartao"], [class*="aba"], .painel-detalhe, input {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+  h1, h2 { font-family: 'Fraunces', Georgia, serif; font-weight: 600; letter-spacing: -0.01em; }
   body {
     margin: 0;
-    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-family: 'Manrope', 'Segoe UI', system-ui, sans-serif;
     background: var(--bg);
     color: var(--text);
     padding: 20px 16px 90px;
@@ -53,7 +70,7 @@
   }
   .aba-piso.ativa {
     background: var(--accent);
-    color: #201007;
+    color: #0A1B2E;
     border-color: var(--accent);
   }
 
@@ -69,7 +86,7 @@
   }
   .mapa-imagem.sem-imagem {
     background-image:
-      repeating-linear-gradient(45deg, #1c2e46 0, #1c2e46 12px, #16263D 12px, #16263D 24px);
+      repeating-linear-gradient(45deg, #1c2e46 0, #1c2e46 12px, #12283F 12px, #12283F 24px);
     border-style: dashed;
   }
   .mapa-imagem img {
@@ -91,7 +108,7 @@
     position: absolute;
     width: 16px; height: 16px;
     background: var(--accent);
-    border: 2px solid #201007;
+    border: 2px solid #0A1B2E;
     border-radius: 50% 50% 50% 0;
     transform: translate(-50%, -100%) rotate(-45deg);
     cursor: pointer;
@@ -119,7 +136,7 @@
     font-size: 11px;
     font-weight: 600;
     color: var(--accent);
-    background: #FF7A4520;
+    background: #D4A94A20;
     padding: 3px 8px;
     border-radius: 999px;
     margin-bottom: 8px;
@@ -151,6 +168,8 @@
 </style>
 </head>
 <body>
+  <div class="fundo-foto" aria-hidden="true"></div>
+  <div class="fundo-veu" aria-hidden="true"></div>
 
   <a class="voltar" href="inicio.html" id="link-voltar" onclick="return voltarInteligente(event)">← Voltar</a>
   <h1>Mapa do recinto</h1>

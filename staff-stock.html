@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stock — Staff JENC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0A1B2E;
+    --card: rgba(18, 40, 63, 0.82);
+    --accent: #D4A94A;
+    --text: #F4F0E4;
+    --muted: #7E97B0;
+    --border: #1F3B57;
+    --sucesso: #7CD992;
+    --erro: #FF6B6B;
+  }
+  * { box-sizing: border-box; }
+  .fundo-foto {
+    position: fixed; inset: 0; z-index: -2;
+    background-image: url("lisboa-simples.jpg");
+    background-size: cover;
+    background-position: center 55%;
+  }
+  .fundo-veu {
+    position: fixed; inset: 0; z-index: -1;
+    background: linear-gradient(180deg, rgba(10,27,46,0.55) 0%, rgba(10,27,46,0.72) 55%, rgba(10,27,46,0.88) 100%);
+  }
+  .card, [class*="card"], [class*="item-"], [class*="cartao"], [class*="aba"], .painel-detalhe, [class*="campo"], input, .rotulo-funcao {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+  h1, h2 { font-family: 'Fraunces', Georgia, serif; font-weight: 600; letter-spacing: -0.01em; }
+  body {
+    margin: 0;
+    font-family: 'Manrope', 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 20px 16px 90px;
+    max-width: 520px;
+    margin-inline: auto;
+  }
+  header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 18px; }
+  h1 { font-size: 22px; margin: 0; }
+  .sub { color: var(--muted); font-size: 13px; margin: 4px 0 0; }
+  .nav-staff { display: flex; gap: 8px; }
+  .nav-staff a, .nav-staff button {
+    background:none; border:1px solid var(--border); color:var(--muted);
+    font-size:14px; padding:6px 10px; border-radius:8px; cursor:pointer; text-decoration:none;
+  }
+
+  .botao-novo-momento {
+    width: 100%; padding: 12px; border-radius: 10px; border: 1px dashed var(--border);
+    background: none; color: var(--muted); font-size: 13px; font-weight: 600; cursor: pointer;
+    margin-bottom: 18px;
+  }
+
+  .form-momento, .form-item {
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 14px; margin-bottom: 14px; display: none;
+  }
+  .form-momento.aberto, .form-item.aberto { display: block; }
+  .form-momento input, .form-item input {
+    width: 100%; padding: 10px 12px; border-radius: 8px; margin-bottom: 8px;
+    border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 13px;
+  }
+  .linha-form { display: flex; gap: 8px; }
+  .linha-form input { flex: 1; }
+  .botao-guardar {
+    padding: 10px 16px; border: none; border-radius: 8px;
+    background: var(--accent); color: #0A1B2E; font-weight: 700; font-size: 13px; cursor: pointer;
+  }
+  .botao-cancelar {
+    padding: 10px 16px; border: 1px solid var(--border); border-radius: 8px;
+    background: none; color: var(--muted); font-size: 13px; cursor: pointer;
+  }
+
+  .card-momento {
+    background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+    padding: 16px; margin-bottom: 16px;
+  }
+  .cabecalho-momento { margin-bottom: 12px; }
+  .cabecalho-momento .nome { font-size: 16px; font-weight: 700; }
+  .cabecalho-momento .detalhe { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  .item-stock { border-top: 1px solid var(--border); padding: 12px 0; }
+  .item-stock:first-of-type { border-top: none; padding-top: 0; }
+  .item-stock .topo-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .item-stock .nome-item { font-size: 14px; font-weight: 600; }
+  .item-stock .contagem-item { font-size: 12px; color: var(--muted); }
+
+  .barra-progresso { height: 6px; border-radius: 999px; background: var(--bg); overflow: hidden; margin-bottom: 8px; }
+  .barra-progresso .preenchido { height: 100%; background: var(--accent); }
+  .barra-progresso .preenchido.esgotado { background: var(--erro); }
+
+  .controlos-item { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; row-gap: 10px; }
+  .botao-passo {
+    width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--bg); color: var(--text); font-size: 12px; font-weight: 700; cursor: pointer;
+  }
+  .controlos-item input[type="number"] {
+    width: 60px; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--bg); color: var(--text); font-size: 13px; text-align: center;
+  }
+  .controlos-item .rotulo-mini { font-size: 11px; color: var(--muted); }
+  .controlos-item .separador { flex: 1; }
+
+  .botao-add-item {
+    width: 100%; padding: 9px; border-radius: 8px; border: 1px dashed var(--border);
+    background: none; color: var(--muted); font-size: 12px; cursor: pointer; margin-top: 10px;
+  }
+
+  .vazio, .estado-carregamento { text-align: center; color: var(--muted); padding: 30px 0; font-size: 14px; }
+  .mensagem-topo { font-size: 12px; text-align: center; margin-bottom: 10px; min-height: 16px; }
+  .mensagem-topo.erro { color: var(--erro); }
+</style>
+</head>
+<body>
+  <div class="fundo-foto" aria-hidden="true"></div>
+  <div class="fundo-veu" aria-hidden="true"></div>
+
+  <header>
+    <div>
+      <h1>Stock</h1>
+      <p class="sub">Coffee breaks, almoço e jantar.</p>
+    </div>
+    <div class="nav-staff">
+      <a href="staff-inicio.html" title="Início">🏠</a>
+      <button onclick="terminarSessaoStaff()">Sair</button>
+    </div>
+  </header>
+
+  <div class="mensagem-topo" id="mensagem-topo"></div>
+
+  <button class="botao-novo-momento" onclick="alternarFormMomento()">+ Novo momento (coffee break / almoço / jantar)</button>
+
+  <div class="form-momento" id="form-momento">
+    <input type="text" id="fm-nome" placeholder="Nome (ex: Coffee Break Manhã)">
+    <div class="linha-form">
+      <input type="date" id="fm-data">
+      <input type="text" id="fm-local" placeholder="Local (ex: Hall central)">
+    </div>
+    <div class="linha-form">
+      <input type="time" id="fm-hora-inicio">
+      <input type="time" id="fm-hora-fim">
+    </div>
+    <div class="linha-form">
+      <button class="botao-guardar" onclick="criarMomento()">Criar momento</button>
+      <button class="botao-cancelar" onclick="alternarFormMomento()">Cancelar</button>
+    </div>
+  </div>
+
+  <div id="lista-momentos"></div>
+
+  <div class="estado-carregamento" id="carregamento">A carregar stock…</div>
+
+  <!-- 1. Biblioteca do Supabase como script normal (não é módulo) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- 2. O teu cliente Supabase -->
+  <script src="supabaseClient.js"></script>
+
+  <script>
+    let momentos = [];
+    let itensPorMomento = {};
+    let intervaloAtualizacao = null;
+
+    init();
+
+    async function init() {
+      const user = await exigirSessaoStaff();
+      if (!user) return;
+
+      const staff = await getStaffAtual(user);
+      if (!staff) {
+        document.getElementById('carregamento').textContent = 'Conta sem acesso de staff.';
+        return;
+      }
+
+      await carregarTudo();
+      document.getElementById('carregamento').style.display = 'none';
+
+      // Atualiza sozinho de vez em quando, para veres o que outros
+      // membros do staff forem registando, sem teres de dar refresh.
+      intervaloAtualizacao = setInterval(carregarTudo, 20000);
+    }
+
+    async function carregarTudo() {
+      momentos = await getMomentos();
+      const itens = await getItens();
+
+      itensPorMomento = {};
+      itens.forEach(i => {
+        if (!itensPorMomento[i.momento_id]) itensPorMomento[i.momento_id] = [];
+        itensPorMomento[i.momento_id].push(i);
+      });
+
+      renderMomentos();
+    }
+
+    async function getMomentos() {
+      const { data, error } = await supabaseClient
+        .from('momentos_stock')
+        .select('id, nome, data, hora_inicio, hora_fim, local')
+        .order('data', { ascending: true })
+        .order('hora_inicio', { ascending: true });
+
+      if (error) {
+        console.error('Erro ao ir buscar momentos:', error.message, error.details, error.hint);
+        return [];
+      }
+      return data ?? [];
+    }
+
+    async function getItens() {
+      const { data, error } = await supabaseClient
+        .from('itens_stock')
+        .select('id, momento_id, nome, quantidade_inicial, quantidade_restante')
+        .order('nome', { ascending: true });
+
+      if (error) {
+        console.error('Erro ao ir buscar itens de stock:', error.message, error.details, error.hint);
+        return [];
+      }
+      return data ?? [];
+    }
+
+    function alternarFormMomento() {
+      document.getElementById('form-momento').classList.toggle('aberto');
+    }
+
+    async function criarMomento() {
+      const nome = document.getElementById('fm-nome').value.trim();
+      if (!nome) {
+        mostrarMensagemTopo('Dá um nome ao momento (ex: "Coffee Break Manhã").', 'erro');
+        return;
+      }
+
+      const { error } = await supabaseClient.from('momentos_stock').insert({
+        nome,
+        data: document.getElementById('fm-data').value || null,
+        hora_inicio: document.getElementById('fm-hora-inicio').value || null,
+        hora_fim: document.getElementById('fm-hora-fim').value || null,
+        local: document.getElementById('fm-local').value.trim() || null
+      });
+
+      if (error) {
+        mostrarMensagemTopo('Erro ao criar momento: ' + error.message, 'erro');
+        return;
+      }
+
+      document.getElementById('fm-nome').value = '';
+      document.getElementById('fm-local').value = '';
+      document.getElementById('fm-data').value = '';
+      document.getElementById('fm-hora-inicio').value = '';
+      document.getElementById('fm-hora-fim').value = '';
+      alternarFormMomento();
+      await carregarTudo();
+    }
+
+    function formatarCabecalhoMomento(m) {
+      const partes = [];
+      if (m.data) {
+        const d = new Date(m.data + 'T00:00:00');
+        partes.push(d.toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit' }));
+      }
+      if (m.hora_inicio) partes.push(`${m.hora_inicio.slice(0,5)}${m.hora_fim ? ' – ' + m.hora_fim.slice(0,5) : ''}`);
+      if (m.local) partes.push(`📍 ${m.local}`);
+      return partes.join(' · ');
+    }
+
+    function renderMomentos() {
+      const container = document.getElementById('lista-momentos');
+      container.innerHTML = '';
+
+      if (momentos.length === 0) {
+        container.innerHTML = '<div class="vazio">Ainda não há nenhum momento criado. Usa o botão acima para criares o primeiro.</div>';
+        return;
+      }
+
+      momentos.forEach(m => {
+        const itens = itensPorMomento[m.id] ?? [];
+
+        const card = document.createElement('div');
+        card.className = 'card-momento';
+
+        const cabecalho = document.createElement('div');
+        cabecalho.className = 'cabecalho-momento';
+        cabecalho.innerHTML = `
+          <div class="nome">${m.nome}</div>
+          <div class="detalhe">${formatarCabecalhoMomento(m) || 'Sem data/hora/local definidos'}</div>
+        `;
+        card.appendChild(cabecalho);
+
+        if (itens.length === 0) {
+          const vazio = document.createElement('div');
+          vazio.className = 'vazio';
+          vazio.style.padding = '10px 0';
+          vazio.textContent = 'Ainda sem itens de stock.';
+          card.appendChild(vazio);
+        }
+
+        itens.forEach(item => card.appendChild(renderItem(item)));
+
+        const botaoAddItem = document.createElement('button');
+        botaoAddItem.className = 'botao-add-item';
+        botaoAddItem.textContent = '+ Adicionar item';
+        botaoAddItem.onclick = () => alternarFormItem(m.id);
+        card.appendChild(botaoAddItem);
+
+        const formItem = document.createElement('div');
+        formItem.className = 'form-item';
+        formItem.id = `form-item-${m.id}`;
+        formItem.innerHTML = `
+          <input type="text" id="fi-nome-${m.id}" placeholder="Nome do item (ex: Café)">
+          <input type="number" id="fi-quantidade-${m.id}" placeholder="Quantidade inicial" min="0">
+          <div class="linha-form">
+            <button class="botao-guardar" onclick="criarItem('${m.id}')">Adicionar</button>
+            <button class="botao-cancelar" onclick="alternarFormItem('${m.id}')">Cancelar</button>
+          </div>
+        `;
+        card.appendChild(formItem);
+
+        container.appendChild(card);
+      });
+    }
+
+    function renderItem(item) {
+      const percentagemConsumida = item.quantidade_inicial > 0
+        ? Math.min(100, Math.round(((item.quantidade_inicial - item.quantidade_restante) / item.quantidade_inicial) * 100))
+        : 0;
+
+      const div = document.createElement('div');
+      div.className = 'item-stock';
+      div.innerHTML = `
+        <div class="topo-item">
+          <div class="nome-item">${item.nome}</div>
+          <div class="contagem-item">restam <strong id="valor-restante-${item.id}">${item.quantidade_restante}</strong> de ${item.quantidade_inicial}</div>
+        </div>
+        <div class="barra-progresso">
+          <div class="preenchido${item.quantidade_restante === 0 ? ' esgotado' : ''}" style="width:${percentagemConsumida}%"></div>
+        </div>
+        <div class="controlos-item">
+          <button class="botao-passo" onclick="ajustarRestante('${item.id}', -1)">-1</button>
+          <button class="botao-passo" onclick="ajustarRestante('${item.id}', -5)">-5</button>
+          <button class="botao-passo" onclick="ajustarRestante('${item.id}', -10)">-10</button>
+          <button class="botao-passo" onclick="ajustarRestante('${item.id}', -25)">-25</button>
+          <div class="separador"></div>
+          <span class="rotulo-mini">restam:</span>
+          <input type="number" min="0" value="${item.quantidade_restante}" id="restante-${item.id}"
+                 onkeydown="if(event.key==='Enter') guardarRestante('${item.id}')">
+          <button class="botao-passo" style="width:auto; padding:0 8px;" onclick="guardarRestante('${item.id}')">✓</button>
+        </div>
+        <div style="margin-top:6px;">
+          <span class="rotulo-mini" style="cursor:pointer; text-decoration:underline;" onclick="alternarEditarInicial('${item.id}')">corrigir quantidade inicial</span>
+          <span id="editar-inicial-${item.id}" style="display:none; margin-left:8px;">
+            <input type="number" min="0" value="${item.quantidade_inicial}" id="inicial-${item.id}" style="width:70px;"
+                   onkeydown="if(event.key==='Enter') guardarInicial('${item.id}')">
+            <button class="botao-passo" style="width:auto; padding:0 8px;" onclick="guardarInicial('${item.id}')">✓</button>
+          </span>
+        </div>
+      `;
+      return div;
+    }
+
+    function alternarFormItem(momentoId) {
+      document.getElementById(`form-item-${momentoId}`).classList.toggle('aberto');
+    }
+
+    async function criarItem(momentoId) {
+      const nome = document.getElementById(`fi-nome-${momentoId}`).value.trim();
+      const quantidade = parseFloat(document.getElementById(`fi-quantidade-${momentoId}`).value) || 0;
+
+      if (!nome) {
+        mostrarMensagemTopo('Dá um nome ao item (ex: "Café").', 'erro');
+        return;
+      }
+
+      const { error } = await supabaseClient.from('itens_stock').insert({
+        momento_id: momentoId,
+        nome,
+        quantidade_inicial: quantidade,
+        quantidade_restante: quantidade
+      });
+
+      if (error) {
+        mostrarMensagemTopo('Erro ao adicionar item: ' + error.message, 'erro');
+        return;
+      }
+
+      await carregarTudo();
+    }
+
+    async function ajustarRestante(itemId, delta) {
+      const { error } = await supabaseClient.rpc('ajustar_restante', { item_id: itemId, delta });
+      if (error) {
+        mostrarMensagemTopo('Erro ao atualizar: ' + error.message, 'erro');
+        return;
+      }
+      await carregarTudo();
+    }
+
+    async function guardarRestante(itemId) {
+      const novoValor = parseFloat(document.getElementById(`restante-${itemId}`).value);
+      if (isNaN(novoValor) || novoValor < 0) {
+        mostrarMensagemTopo('Escreve um número válido.', 'erro');
+        return;
+      }
+
+      const { error } = await supabaseClient
+        .from('itens_stock')
+        .update({ quantidade_restante: novoValor, atualizado_em: new Date().toISOString() })
+        .eq('id', itemId);
+
+      if (error) {
+        mostrarMensagemTopo('Erro ao atualizar: ' + error.message, 'erro');
+        return;
+      }
+      await carregarTudo();
+    }
+
+    function alternarEditarInicial(itemId) {
+      const el = document.getElementById(`editar-inicial-${itemId}`);
+      el.style.display = el.style.display === 'none' ? 'inline-block' : 'none';
+    }
+
+    async function guardarInicial(itemId) {
+      const novoValor = parseFloat(document.getElementById(`inicial-${itemId}`).value);
+      if (isNaN(novoValor) || novoValor < 0) {
+        mostrarMensagemTopo('Escreve um número válido.', 'erro');
+        return;
+      }
+
+      const { error } = await supabaseClient
+        .from('itens_stock')
+        .update({ quantidade_inicial: novoValor, atualizado_em: new Date().toISOString() })
+        .eq('id', itemId);
+
+      if (error) {
+        mostrarMensagemTopo('Erro ao atualizar: ' + error.message, 'erro');
+        return;
+      }
+      await carregarTudo();
+    }
+
+    function mostrarMensagemTopo(texto, tipo) {
+      const el = document.getElementById('mensagem-topo');
+      el.textContent = texto;
+      el.className = 'mensagem-topo' + (tipo ? ' ' + tipo : '');
+      setTimeout(() => { el.textContent = ''; }, 4000);
+    }
+
+    async function terminarSessaoStaff() {
+      if (intervaloAtualizacao) clearInterval(intervaloAtualizacao);
+      await supabaseClient.auth.signOut();
+      window.location.href = 'login.html';
+    }
+  </script>
+
+</body>
+</html>
