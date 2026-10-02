@@ -5,107 +5,85 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Entrar — JENC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0A1B2E;
-    --card: rgba(18, 40, 63, 0.72);
-    --accent: #D4A94A;
-    --text: #F4F0E4;
-    --muted: #C9D6E5;
-    --border: rgba(212, 169, 74, 0.35);
-    --erro: #FF6B6B;
-  }
-  * { box-sizing: border-box; }
-  h1, h2 { font-family: 'Fraunces', Georgia, serif; font-weight: 600; letter-spacing: -0.01em; }
-
-  .fundo-foto {
-    position: fixed; inset: 0; z-index: -2;
-    background-image: url("lisboa-azulejo.jpg");
-    background-size: cover;
-    background-position: center 35%;
-  }
-  .fundo-veu {
-    position: fixed; inset: 0; z-index: -1;
-    background: linear-gradient(180deg, rgba(10,27,46,0.78) 0%, rgba(10,27,46,0.55) 45%, rgba(10,27,46,0.85) 100%);
-  }
-  .faixa-topo {
-    position: fixed; top: 0; left: 0; right: 0; height: 4px; z-index: 3;
-    background: linear-gradient(90deg, #8A6A22, var(--accent) 25%, #E8C873 50%, var(--accent) 75%, #8A6A22);
-  }
-
+  :root{--navy:#0C2340;--gold:#BD8C1C;--gold-claro:#E8C873;--ivory:#F6F1E4;--mist:#93A6BF;--erro:#E8877A;--sucesso:#8FCB9B;--hairline:rgba(189,140,28,.3)}
+  *{box-sizing:border-box}
+  html{background:var(--navy)}
+  body{margin:0;font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:transparent;color:var(--ivory)}
+  .fundo-jenc{position:fixed;inset:0;z-index:-2;background:var(--navy) url("jenc-fundo.png") center top/cover no-repeat}
+  .fundo-jenc-veu{position:fixed;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(12,35,64,.35),rgba(12,35,64,.6))}
+  .campo-linha{margin-bottom:16px}
+  .campo-linha label{display:block;font-size:12px;font-weight:600;color:var(--mist);margin-bottom:6px}
+  .campo-linha input{width:100%;padding:14px 16px;font:500 15px Montserrat,sans-serif;color:var(--ivory);background:rgba(22,55,95,.5);border:1px solid var(--hairline);border-radius:12px}
+  .campo-linha input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(189,140,28,.18)}
+  .botao-dourado{width:100%;padding:15px;margin-top:6px;border:0;border-radius:12px;background:linear-gradient(135deg,#C4931F,#E8C873);color:var(--navy);font:700 15px Montserrat,sans-serif;cursor:pointer}
+  .botao-dourado:disabled{opacity:.6}
+</style>
+<style>
   body {
-    margin: 0;
     min-height: 100vh;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    font-family: 'Manrope', 'Segoe UI', system-ui, sans-serif;
-    background: var(--bg);
-    color: var(--text);
     padding: 20px;
-    position: relative;
   }
+
   .caixa {
     width: 100%;
     max-width: 380px;
-    position: relative;
-    z-index: 2;
-    background: var(--card);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    padding: 28px 26px;
   }
-  .marca { text-align: center; margin-bottom: 6px; }
-  .marca .jenc { font-size: 34px; letter-spacing: 0.02em; }
-  .marca .tema {
-    font-family: 'Fraunces', Georgia, serif; font-style: italic; font-weight: 500;
-    color: var(--accent); font-size: 15px; margin-top: 2px;
-  }
-  h1 { font-size: 24px; margin: 0 0 6px; text-align: center; }
-  .sub { color: var(--muted); font-size: 14px; margin: 0 0 28px; text-align: center; }
 
-  label { font-size: 13px; color: var(--muted); display: block; margin: 14px 0 6px; }
-  input {
-    width: 100%; padding: 12px 14px; border-radius: 10px;
-    border: 1px solid var(--border); background: rgba(10,27,46,0.55); color: var(--text);
-    font-size: 14px;
+  .logo-wrap {
+    text-align: center;
+    margin-bottom: 34px;
   }
-  input:focus { outline: none; border-color: var(--accent); }
-
-  button.principal {
-    width: 100%; margin-top: 22px; padding: 13px; border: none; border-radius: 10px;
-    background: var(--accent); color: #0A1B2E; font-size: 15px; font-weight: 600; cursor: pointer;
+  .logo-wrap img { width: 168px; height: auto; }
+  .logo-wrap .flourish {
+    width: 46px;
+    height: auto;
+    opacity: 0.85;
+    margin-top: 18px;
   }
-  button.principal:disabled { opacity: 0.6; cursor: default; }
 
-  .mensagem { margin-top: 14px; font-size: 13px; text-align: center; min-height: 18px; }
+  h1.titulo-forma { font-size: 20px; font-weight: 700; margin: 0 0 4px; text-align: center; }
+  .sub {
+    color: var(--mist);
+    font-size: 13.5px;
+    margin: 0 0 32px;
+    text-align: center;
+  }
+
+  .mensagem { margin-top: 16px; font-size: 13px; text-align: center; min-height: 18px; }
   .mensagem.erro { color: var(--erro); }
-  .mensagem.sucesso { color: #7CD992; }
+  .mensagem.sucesso { color: var(--sucesso); }
 </style>
 </head>
 <body>
 
-  <div class="fundo-foto" aria-hidden="true"></div>
-  <div class="fundo-veu" aria-hidden="true"></div>
-  <div class="faixa-topo" aria-hidden="true"></div>
+  <div class="fundo-jenc" aria-hidden="true"></div>
+  <div class="fundo-jenc-veu" aria-hidden="true"></div>
 
   <div class="caixa">
-    <div class="marca">
-      <h1 class="jenc">JENC</h1>
-      <div class="tema">Futuro sobre o Tejo</div>
+    <div class="logo-wrap">
+      <img src="jenc-logo.png" alt="XII JENC — Junior Entrepreneurs National Congress 2026">
     </div>
-    <p class="sub">Entra com a tua conta (participante ou staff).</p>
 
-    <label for="email">Email</label>
-    <input type="email" id="email" placeholder="tu@exemplo.com" autocomplete="email">
+    <h1 class="titulo-forma">Entra na tua conta</h1>
+    <p class="sub">Participante ou equipa — usa o email que recebeste.</p>
 
-    <label for="password">Palavra-passe</label>
-    <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+    <div class="campo-linha">
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="tu@exemplo.com" autocomplete="email">
+    </div>
 
-    <button class="principal" id="botao-principal" onclick="entrar()">Entrar</button>
+    <div class="campo-linha">
+      <label for="password">Palavra-passe</label>
+      <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+    </div>
+
+    <button class="botao-dourado" id="botao-principal" onclick="entrar()">Entrar</button>
 
     <div class="mensagem" id="mensagem"></div>
   </div>
@@ -153,9 +131,9 @@
       }
     }
 
-    // Verifica se o utilizador tem linha em `staff` ou em `participantes`
-    // e redireciona para a página correspondente. Devolve false se não
-    // encontrar nenhuma das duas (conta sem acesso).
+    // Verifica se o utilizador tem linha em `staff`, `logistica` ou
+    // `participantes` e redireciona para a página correspondente.
+    // Devolve false se não encontrar nenhuma (conta sem acesso).
     async function redirecionarConformeTipo(user) {
       const { data: staff } = await supabaseClient
         .from('staff')
@@ -165,6 +143,17 @@
 
       if (staff) {
         window.location.href = 'staff-inicio.html';
+        return true;
+      }
+
+      const { data: logistica } = await supabaseClient
+        .from('logistica')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (logistica) {
+        window.location.href = 'logistica-inicio.html';
         return true;
       }
 
@@ -194,6 +183,8 @@
       el.className = 'mensagem' + (tipo ? ' ' + tipo : '');
     }
   </script>
+
+  <script src="jenc-ui.js"></script>
 
 </body>
 </html>

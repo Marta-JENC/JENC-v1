@@ -99,15 +99,28 @@ async function exigirSessaoStaff() {
 }
 
 async function getStaffAtual(user) {
-  const { data, error } = await supabaseClient
+  const { data: staff, error } = await supabaseClient
     .from('staff')
     .select('*')
     .eq('user_id', user.id)
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error('Erro ao ir buscar o staff:', error.message, error.details, error.hint);
     return null;
   }
-  return data;
+  if (staff) return { ...staff, tipo_conta: 'staff' };
+
+  // Se não é staff, procura na tabela logistica
+  const { data: log, error: erroLog } = await supabaseClient
+    .from('logistica')
+    .select('*')
+    .eq('user_id', user.id)
+    .maybeSingle();
+
+  if (erroLog) {
+    console.error('Erro ao ir buscar a logística:', erroLog.message, erroLog.details, erroLog.hint);
+    return null;
+  }
+  return log ? { ...log, tipo_conta: 'logistica' } : null;
 }

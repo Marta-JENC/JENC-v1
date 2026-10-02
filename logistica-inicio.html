@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Staff — JENC</title>
+<title>Logística — JENC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="jenc-tema.css">
@@ -69,6 +69,9 @@
   .card-resumo-mini .tag { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: 0.5px; }
   .card-resumo-mini .numero { font-size: 18px; font-weight: 800; color: var(--accent); margin-top: 3px; }
 
+  section h3 { font-size: 13px; color: var(--muted); margin: 24px 0 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+  section h3:first-of-type { margin-top: 0; }
+
   .grid-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .card-nav {
     background: var(--card);
@@ -79,6 +82,7 @@
     color: var(--text);
     display: block;
   }
+  .card-nav.destaque { border-color: var(--accent); }
   .card-nav .icone { font-size: 24px; margin-bottom: 10px; display: block; }
   .card-nav .titulo { font-size: 14px; font-weight: 700; margin-bottom: 3px; }
   .card-nav .descricao { font-size: 12px; color: var(--muted); line-height: 1.4; }
@@ -98,7 +102,7 @@
     </div>
     <div style="display:flex; gap:8px;">
       <button class="sair" onclick="atualizarAgora()" id="botao-atualizar">Atualizar</button>
-      <button class="sair" onclick="terminarSessaoStaff()">Sair</button>
+      <button class="sair" onclick="terminarSessaoLogistica()">Sair</button>
     </div>
   </header>
 
@@ -121,33 +125,57 @@
       </div>
     </div>
 
-    <div class="grid-nav">
-      <a href="staff-checkin.html" class="card-nav">
-        <span class="icone"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9.5" cy="8" r="3.3"/><path d="M3.5 20c.7-3.6 3-5.6 6-5.6M14.5 17.2l2.3 2.3 4-4.4"/></svg></span>
-        <div class="titulo">Check-in</div>
-        <div class="descricao">Ler o QR de um participante e registar entrada/saída.</div>
-      </a>
-      <a href="staff-atividades.html" class="card-nav">
-        <span class="icone"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 10h16M9 3v4M15 3v4"/></svg></span>
-        <div class="titulo">Atividades</div>
-        <div class="descricao">Consultar o programa, salas e capacidades.</div>
-      </a>
-      <a href="staff-horario.html" class="card-nav">
-        <span class="icone"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg></span>
-        <div class="titulo">O Meu Horário</div>
-        <div class="descricao">Onde tens de estar, e a que horas.</div>
-      </a>
-      <a href="staff-equipa.html" class="card-nav">
-        <span class="icone"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8.3" r="3"/><path d="M3.3 19.5c.6-3.2 2.7-5 5.7-5s5.1 1.8 5.7 5M16 6a3 3 0 0 1 0 5.8M16 14.6c2.3.3 3.9 1.9 4.4 4.9"/></svg></span>
-        <div class="titulo">Equipa</div>
-        <div class="descricao">Contactos de toda a equipa de staff.</div>
-      </a>
-      <a href="staff-stock.html" class="card-nav">
-        <span class="icone"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.2 12 4l8 4.2v8.1l-8 4.2-8-4.2ZM4 8.2 12 12l8-3.8M12 12v8.5"/></svg></span>
-        <div class="titulo">Stock</div>
-        <div class="descricao">Coffee breaks, almoço e jantar.</div>
-      </a>
-    </div>
+    <section>
+      <h3>Gestão (equipa de logística)</h3>
+      <div class="grid-nav">
+        <a href="logistica-gestao.html#agenda" class="card-nav destaque">
+          <span class="icone"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1-4L16 5l3 3L8 19l-4 1ZM14 7l3 3"/></svg></span>
+          <div class="titulo">Agenda &amp; Salas</div>
+          <div class="descricao">Criar, editar ou apagar atividades — hora, local, capacidade.</div>
+        </a>
+        <a href="logistica-gestao.html#turnos" class="card-nav destaque">
+          <span class="icone"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9h11v5a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4V9ZM16 10h1.5a2 2 0 0 1 0 4H16M8 3v3M12 3v3"/></svg></span>
+          <div class="titulo">Turnos &amp; Coffee Breaks</div>
+          <div class="descricao">Editar horários e locais de refeições e coffee breaks.</div>
+        </a>
+        <a href="logistica-compras.html" class="card-nav destaque">
+          <span class="icone"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.3 10a2 2 0 0 1-2 1.7H8.3a2 2 0 0 1-2-1.7L5 8ZM8.5 8V6.5a3.5 3.5 0 0 1 7 0V8"/></svg></span>
+          <div class="titulo">Compras &amp; Budget</div>
+          <div class="descricao">Lista de compras, orçamento e histórico de compras por momento.</div>
+        </a>
+      </div>
+    </section>
+
+    <section>
+      <h3>Consulta (igual ao staff)</h3>
+      <div class="grid-nav">
+        <a href="staff-checkin.html" class="card-nav">
+          <span class="icone"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9.5" cy="8" r="3.3"/><path d="M3.5 20c.7-3.6 3-5.6 6-5.6M14.5 17.2l2.3 2.3 4-4.4"/></svg></span>
+          <div class="titulo">Check-in</div>
+          <div class="descricao">Ler o QR de um participante e registar entrada/saída.</div>
+        </a>
+        <a href="staff-atividades.html" class="card-nav">
+          <span class="icone"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 10h16M9 3v4M15 3v4"/></svg></span>
+          <div class="titulo">Atividades</div>
+          <div class="descricao">Consultar o programa, salas e capacidades.</div>
+        </a>
+        <a href="staff-stock.html" class="card-nav">
+          <span class="icone"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.2 12 4l8 4.2v8.1l-8 4.2-8-4.2ZM4 8.2 12 12l8-3.8M12 12v8.5"/></svg></span>
+          <div class="titulo">Stock</div>
+          <div class="descricao">Coffee breaks, almoço e jantar.</div>
+        </a>
+        <a href="staff-horario.html" class="card-nav">
+          <span class="icone"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg></span>
+          <div class="titulo">Horário da Equipa</div>
+          <div class="descricao">Onde cada pessoa tem de estar, e a que horas.</div>
+        </a>
+        <a href="staff-equipa.html" class="card-nav">
+          <span class="icone"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8.3" r="3"/><path d="M3.3 19.5c.6-3.2 2.7-5 5.7-5s5.1 1.8 5.7 5M16 6a3 3 0 0 1 0 5.8M16 14.6c2.3.3 3.9 1.9 4.4 4.9"/></svg></span>
+          <div class="titulo">Equipa</div>
+          <div class="descricao">Contactos de toda a equipa de staff.</div>
+        </a>
+      </div>
+    </section>
 
   </div>
 
@@ -163,9 +191,9 @@
 
     init();
 
-    // Aceita tanto contas de staff como de logística (mesmo padrão já
-    // usado em staff-checkin, staff-atividades, staff-equipa, staff-horario e staff-stock).
-    async function exigirSessaoQualquer() {
+    // Sessão + verificação de conta de logística, sem depender de
+    // funções externas (definidas aqui para não mexer no supabaseClient.js).
+    async function exigirSessaoLogistica() {
       const { data: { session } } = await supabaseClient.auth.getSession();
       if (!session) {
         window.location.href = 'login.html';
@@ -174,42 +202,36 @@
       return session.user;
     }
 
-    async function getPessoaStaffOuLogistica(user) {
-      const { data: staff } = await supabaseClient
-        .from('staff').select('*').eq('user_id', user.id).maybeSingle();
-      if (staff) return { ...staff, tipo_conta: 'staff' };
+    async function getLogisticaAtual(user) {
+      const { data, error } = await supabaseClient
+        .from('logistica')
+        .select('id, nome, email, telefone')
+        .eq('user_id', user.id)
+        .maybeSingle();
 
-      const { data: log } = await supabaseClient
-        .from('logistica').select('*').eq('user_id', user.id).maybeSingle();
-      if (log) return { ...log, tipo_conta: 'logistica' };
-
-      return null;
+      if (error) {
+        console.error('Erro ao ir buscar dados da logística:', error.message, error.details, error.hint);
+        return null;
+      }
+      return data;
     }
 
     async function init() {
-      const user = await exigirSessaoQualquer();
+      const user = await exigirSessaoLogistica();
       if (!user) return;
 
-      const staff = await getPessoaStaffOuLogistica(user);
-      if (!staff) {
-        document.getElementById('carregamento').textContent = 'Conta sem acesso de staff ou logística.';
+      const logistica = await getLogisticaAtual(user);
+      if (!logistica) {
+        document.getElementById('carregamento').textContent = 'Conta sem acesso de logística.';
         return;
       }
 
-      // A logística tem a sua própria página inicial (com as funções de gestão).
-      if (staff.tipo_conta === 'logistica') {
-        window.location.replace('logistica-inicio.html');
-        return;
-      }
-
-      renderSaudacao(staff);
+      renderSaudacao(logistica);
       await renderResumoCheckins();
 
       document.getElementById('carregamento').style.display = 'none';
       document.getElementById('conteudo').style.display = 'block';
 
-      // Atualiza sozinho de vez em quando, para veres check-ins feitos
-      // por outros membros do staff sem teres de sair e voltar a entrar.
       intervaloAtualizacao = setInterval(renderResumoCheckins, 15000);
     }
 
@@ -222,13 +244,11 @@
       botao.disabled = false;
     }
 
-    function renderSaudacao(staff) {
+    function renderSaudacao(logistica) {
       const hora = new Date().getHours();
       const cumprimento = hora < 12 ? 'Bom dia' : hora < 20 ? 'Boa tarde' : 'Boa noite';
-      document.getElementById('saudacao').textContent = `${cumprimento}, ${staff.nome ?? 'staff'} `;
-      document.getElementById('subtitulo').textContent = staff.tipo_conta === 'logistica'
-        ? 'Equipa de Logística — JENC.'
-        : (staff.funcao ? `Função: ${staff.funcao}` : 'Área de staff JENC.');
+      document.getElementById('saudacao').textContent = `${cumprimento}, ${logistica.nome ?? 'logística'} `;
+      document.getElementById('subtitulo').textContent = 'Equipa de Logística — JENC.';
     }
 
     async function renderResumoCheckins() {
@@ -249,7 +269,7 @@
       }
 
       const distintosPorTipo = { evento: new Set(), alojamento: new Set(), refeicao: new Set() };
-      const TIPOS_REFEICAO = ['almoco', 'jantar', 'refeicao']; // junta as refeições todas num só número
+      const TIPOS_REFEICAO = ['almoco', 'jantar', 'refeicao'];
       (entradas ?? []).forEach(e => {
         if (TIPOS_REFEICAO.includes(e.tipo)) {
           distintosPorTipo.refeicao.add(e.participante_id);
@@ -264,7 +284,7 @@
       document.getElementById('resumo-refeicao').textContent = `${distintosPorTipo.refeicao.size} / ${totalParticipantes ?? '—'}`;
     }
 
-    async function terminarSessaoStaff() {
+    async function terminarSessaoLogistica() {
       if (intervaloAtualizacao) clearInterval(intervaloAtualizacao);
       await supabaseClient.auth.signOut();
       window.location.href = 'login.html';

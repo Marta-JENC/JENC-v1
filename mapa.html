@@ -5,35 +5,37 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mapa — JENC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="jenc-tema.css">
 <style>
   :root {
-    --bg: #0A1B2E;
-    --card: rgba(18, 40, 63, 0.82);
-    --accent: #D4A94A;
-    --text: #F4F0E4;
-    --muted: #7E97B0;
-    --border: #1F3B57;
+    --bg: #0C2340;
+    --card: rgba(22, 55, 95, 0.46);
+    --accent: #BD8C1C;
+    --text: #F6F1E4;
+    --muted: #93A6BF;
+    --border: rgba(189, 140, 28, 0.24);
   }
   * { box-sizing: border-box; }
   .fundo-foto {
     position: fixed; inset: 0; z-index: -2;
-    background-image: url("lisboa-simples.jpg");
-    background-size: cover;
-    background-position: center 55%;
+    background-image: url("jenc-fundo.png");
+    background-size: 640px auto;
+    background-position: top center;
+    background-repeat: repeat;
   }
   .fundo-veu {
     position: fixed; inset: 0; z-index: -1;
-    background: linear-gradient(180deg, rgba(10,27,46,0.55) 0%, rgba(10,27,46,0.72) 55%, rgba(10,27,46,0.88) 100%);
+    background: linear-gradient(180deg, rgba(12,35,64,0.55) 0%, rgba(12,35,64,0.72) 55%, rgba(12,35,64,0.88) 100%);
   }
   .card, [class*="card"], [class*="item-"], [class*="cartao"], [class*="aba"], .painel-detalhe, input {
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
   }
-  h1, h2 { font-family: 'Fraunces', Georgia, serif; font-weight: 600; letter-spacing: -0.01em; }
+  h1, h2 { font-family: 'Montserrat', sans-serif; font-weight: 700; letter-spacing: -0.015em; }
   body {
     margin: 0;
-    font-family: 'Manrope', 'Segoe UI', system-ui, sans-serif;
+    font-family: 'Montserrat', 'Segoe UI', system-ui, sans-serif;
     background: var(--bg);
     color: var(--text);
     padding: 20px 16px 90px;
@@ -70,7 +72,7 @@
   }
   .aba-piso.ativa {
     background: var(--accent);
-    color: #0A1B2E;
+    color: #0C2340;
     border-color: var(--accent);
   }
 
@@ -108,7 +110,7 @@
     position: absolute;
     width: 16px; height: 16px;
     background: var(--accent);
-    border: 2px solid #0A1B2E;
+    border: 2px solid #0C2340;
     border-radius: 50% 50% 50% 0;
     transform: translate(-50%, -100%) rotate(-45deg);
     cursor: pointer;
@@ -136,7 +138,7 @@
     font-size: 11px;
     font-weight: 600;
     color: var(--accent);
-    background: #D4A94A20;
+    background: #BD8C1C20;
     padding: 3px 8px;
     border-radius: 999px;
     margin-bottom: 8px;
@@ -166,6 +168,7 @@
     font-size: 14px;
   }
 </style>
+<link rel="stylesheet" href="jenc-estilo.css">
 </head>
 <body>
   <div class="fundo-foto" aria-hidden="true"></div>
@@ -221,6 +224,9 @@
       localAlvoId = params.get('local');
 
       pisos = await getPisos();
+      // Só mostra pisos que já têm planta (se nenhum tiver, mostra todos).
+      const comImagem = pisos.filter(p => p.imagem_url);
+      if (comImagem.length > 0) pisos = comImagem;
 
       if (pisos.length === 0) {
         document.getElementById('carregamento').textContent =
@@ -235,7 +241,7 @@
       // Senão, o primeiro piso por ordem.
       if (localAlvoId) {
         const local = locais.find(l => l.id === localAlvoId);
-        pisoSelecionado = local?.piso_id ?? pisos[0].id;
+        pisoSelecionado = pisos.some(p => p.id === local?.piso_id) ? local.piso_id : pisos[0].id;
       } else {
         pisoSelecionado = pisos[0].id;
       }
@@ -284,6 +290,7 @@
     function renderAbasPisos() {
       const container = document.getElementById('abas-pisos');
       container.innerHTML = '';
+      container.style.display = pisos.length > 1 ? 'flex' : 'none';
 
       pisos.forEach(p => {
         const aba = document.createElement('div');
@@ -376,6 +383,8 @@
       document.getElementById('painel-detalhe').style.display = 'block';
     }
   </script>
+
+  <script src="jenc-ui.js"></script>
 
 </body>
 </html>

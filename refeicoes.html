@@ -5,35 +5,37 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Refeições — JENC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="jenc-tema.css">
 <style>
   :root {
-    --bg: #0A1B2E;
-    --card: rgba(18, 40, 63, 0.82);
-    --accent: #D4A94A;
-    --text: #F4F0E4;
-    --muted: #7E97B0;
-    --border: #1F3B57;
+    --bg: #0C2340;
+    --card: rgba(22, 55, 95, 0.46);
+    --accent: #BD8C1C;
+    --text: #F6F1E4;
+    --muted: #93A6BF;
+    --border: rgba(189, 140, 28, 0.24);
   }
   * { box-sizing: border-box; }
   .fundo-foto {
     position: fixed; inset: 0; z-index: -2;
-    background-image: url("lisboa-simples.jpg");
-    background-size: cover;
-    background-position: center 55%;
+    background-image: url("jenc-fundo.png");
+    background-size: 640px auto;
+    background-position: top center;
+    background-repeat: repeat;
   }
   .fundo-veu {
     position: fixed; inset: 0; z-index: -1;
-    background: linear-gradient(180deg, rgba(10,27,46,0.55) 0%, rgba(10,27,46,0.72) 55%, rgba(10,27,46,0.88) 100%);
+    background: linear-gradient(180deg, rgba(12,35,64,0.55) 0%, rgba(12,35,64,0.72) 55%, rgba(12,35,64,0.88) 100%);
   }
   .card, [class*="card"], [class*="item-"], [class*="cartao"], [class*="aba"], .painel-detalhe, input {
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
   }
-  h1, h2 { font-family: 'Fraunces', Georgia, serif; font-weight: 600; letter-spacing: -0.01em; }
+  h1, h2 { font-family: 'Montserrat', sans-serif; font-weight: 700; letter-spacing: -0.015em; }
   body {
     margin: 0;
-    font-family: 'Manrope', 'Segoe UI', system-ui, sans-serif;
+    font-family: 'Montserrat', 'Segoe UI', system-ui, sans-serif;
     background: var(--bg);
     color: var(--text);
     padding: 20px 16px 90px;
@@ -53,7 +55,7 @@
     background: linear-gradient(135deg, var(--accent), #E8C873);
     border-radius: 16px;
     padding: 22px;
-    color: #0A1B2E;
+    color: #0C2340;
     margin-bottom: 24px;
   }
   .cartao-principal .tag { font-size: 12px; font-weight: 600; opacity: 0.75; }
@@ -78,6 +80,7 @@
 
   .estado { text-align: center; color: var(--muted); padding: 40px 0; font-size: 14px; }
 </style>
+<link rel="stylesheet" href="jenc-estilo.css">
 </head>
 <body>
   <div class="fundo-foto" aria-hidden="true"></div>
@@ -90,8 +93,8 @@
     <div class="cartao-principal" id="bloco-meu-turno">
       <div class="tag">O TEU TURNO</div>
       <h2 id="meu-turno-nome">—</h2>
-      <div class="linha">🕐 <span id="meu-turno-hora">—</span></div>
-      <div class="linha">📍 <span id="meu-turno-local">—</span></div>
+      <div class="linha"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg> <span id="meu-turno-hora">—</span></div>
+      <div class="linha"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.1 7-11.5A7 7 0 0 0 5 9.5C5 14.9 12 21 12 21Z"/><circle cx="12" cy="9.3" r="2.3"/></svg> <span id="meu-turno-local">—</span></div>
     </div>
 
     <section>
@@ -174,7 +177,7 @@
         item.innerHTML = `
           <div>
             <div class="nome">${t.nome}${t.nome === nomeDoMeuTurno ? ' (o teu)' : ''}</div>
-            <div class="local">📍 ${t.local ?? 'Local a anunciar'}</div>
+            <div class="local"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.1 7-11.5A7 7 0 0 0 5 9.5C5 14.9 12 21 12 21Z"/><circle cx="12" cy="9.3" r="2.3"/></svg> ${t.local ?? 'Local a anunciar'}</div>
           </div>
           <div class="hora">${t.hora_inicio.slice(0,5)} – ${t.hora_fim.slice(0,5)}</div>
         `;
@@ -182,6 +185,8 @@
       });
     }
   </script>
+
+  <script src="jenc-ui.js"></script>
 
 </body>
 </html>

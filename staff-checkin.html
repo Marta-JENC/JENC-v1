@@ -5,37 +5,39 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Check-in — Staff JENC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="jenc-tema.css">
 <style>
   :root {
-    --bg: #0A1B2E;
-    --card: rgba(18, 40, 63, 0.82);
-    --accent: #D4A94A;
-    --text: #F4F0E4;
-    --muted: #7E97B0;
-    --border: #1F3B57;
-    --erro: #FF6B6B;
-    --sucesso: #7CD992;
+    --bg: #0C2340;
+    --card: rgba(22, 55, 95, 0.46);
+    --accent: #BD8C1C;
+    --text: #F6F1E4;
+    --muted: #93A6BF;
+    --border: rgba(189, 140, 28, 0.24);
+    --erro: #E8877A;
+    --sucesso: #8FCB9B;
   }
   * { box-sizing: border-box; }
   .fundo-foto {
     position: fixed; inset: 0; z-index: -2;
-    background-image: url("lisboa-simples.jpg");
-    background-size: cover;
-    background-position: center 55%;
+    background-image: url("jenc-fundo.png");
+    background-size: 640px auto;
+    background-position: top center;
+    background-repeat: repeat;
   }
   .fundo-veu {
     position: fixed; inset: 0; z-index: -1;
-    background: linear-gradient(180deg, rgba(10,27,46,0.55) 0%, rgba(10,27,46,0.72) 55%, rgba(10,27,46,0.88) 100%);
+    background: linear-gradient(180deg, rgba(12,35,64,0.55) 0%, rgba(12,35,64,0.72) 55%, rgba(12,35,64,0.88) 100%);
   }
   .card, [class*="card"], [class*="item-"], [class*="cartao"], [class*="aba"], .painel-detalhe, [class*="campo"], input, .rotulo-funcao {
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
   }
-  h1, h2 { font-family: 'Fraunces', Georgia, serif; font-weight: 600; letter-spacing: -0.01em; }
+  h1, h2 { font-family: 'Montserrat', sans-serif; font-weight: 700; letter-spacing: -0.015em; }
   body {
     margin: 0;
-    font-family: 'Manrope', 'Segoe UI', system-ui, sans-serif;
+    font-family: 'Montserrat', 'Segoe UI', system-ui, sans-serif;
     background: var(--bg);
     color: var(--text);
     padding: 20px 16px 90px;
@@ -88,7 +90,7 @@
     border-radius: 10px;
     border: none;
     background: var(--accent);
-    color: #0A1B2E;
+    color: #0C2340;
     font-weight: 600;
     cursor: pointer;
   }
@@ -97,54 +99,63 @@
   .mensagem.erro { color: var(--erro); }
   .mensagem.sucesso { color: var(--sucesso); }
 
-  .cartao-perfil {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 20px;
-    display: none;
+  .passo { font-size: 12px; color: var(--muted); font-weight: 700; margin: 0 0 8px; letter-spacing: 0.3px; }
+  .linha-tipo { display: flex; gap: 6px; margin-bottom: 10px; }
+  .tipo-opcao {
+    flex: 1; text-align: center; padding: 10px 6px; border-radius: 8px;
+    background: var(--card); border: 1px solid var(--border); color: var(--muted);
+    font-size: 13px; cursor: pointer; user-select: none;
   }
-  .cartao-perfil .nome { font-size: 20px; font-weight: 700; margin-bottom: 2px; }
-  .cartao-perfil .junior { color: var(--accent); font-size: 13px; font-weight: 600; margin-bottom: 18px; }
+  .tipo-opcao.ativo { background: var(--accent); color: #0C2340; border-color: var(--accent); font-weight: 700; }
+  .tipo-opcao.acao-saida.ativo { background: var(--erro); border-color: var(--erro); color: #3a0b0b; }
+  .estado-modo { font-size: 13px; text-align: center; margin: 4px 0 16px; color: var(--muted); }
+  .estado-modo.pronto { color: var(--accent); font-weight: 600; }
+  .bloqueado { opacity: 0.45; pointer-events: none; }
 
-  .linha-perfil {
-    display: flex;
-    justify-content: space-between;
-    padding: 9px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: 13px;
+  .cartao-resultado {
+    background: var(--card); border: 1px solid var(--border); border-left-width: 5px;
+    border-radius: 14px; padding: 14px 16px; margin-bottom: 20px; display: none;
   }
-  .linha-perfil:last-of-type { border-bottom: none; }
+  .cartao-resultado.ok { border-color: var(--sucesso); }
+  .cartao-resultado.erro { border-color: var(--erro); }
+  .cartao-resultado .estado-res { font-size: 12px; font-weight: 700; margin-bottom: 6px; }
+  .cartao-resultado.ok .estado-res { color: var(--sucesso); }
+  .cartao-resultado.erro .estado-res { color: var(--erro); }
+  .cartao-resultado .nome { font-size: 18px; font-weight: 700; }
+  .cartao-resultado .junior { color: var(--accent); font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+  .linha-perfil {
+    display: flex; justify-content: space-between; gap: 10px; padding: 7px 0;
+    border-top: 1px solid var(--border); font-size: 13px;
+  }
   .linha-perfil .rotulo { color: var(--muted); }
   .linha-perfil .valor { font-weight: 600; text-align: right; }
   .linha-perfil .valor.alerta { color: var(--erro); }
 
-  .agenda-hoje { margin-top: 16px; }
-  .agenda-hoje h4 { font-size: 12px; color: var(--muted); margin: 0 0 8px; }
-  .item-agenda {
-    display: flex; gap: 10px; font-size: 13px; padding: 6px 0;
+  .filtros { display: flex; gap: 8px; margin-bottom: 10px; }
+  .filtros select, .filtros input {
+    padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border);
+    background: var(--card); color: var(--text); font-size: 13px; min-width: 0;
   }
-  .item-agenda .hora { color: var(--accent); font-weight: 600; width: 44px; flex-shrink: 0; }
+  .filtros select { flex: 1; }
+  .filtros input { flex: 1; }
+  .filtros select:focus, .filtros input:focus { outline: none; border-color: var(--accent); }
 
-  .acoes-checkin { margin-top: 20px; }
-  .acoes-checkin .linha-tipo { display: flex; gap: 6px; margin-bottom: 10px; }
-  .tipo-opcao {
-    flex: 1; text-align: center; padding: 8px; border-radius: 8px;
-    background: var(--bg); border: 1px solid var(--border); color: var(--muted);
-    font-size: 12px; cursor: pointer;
+  .cabecalho-lista { display: flex; justify-content: space-between; align-items: center; margin: 6px 0 8px; font-size: 12px; color: var(--muted); }
+  .lista-pendentes { max-height: 360px; overflow-y: auto; }
+  .item-pendente {
+    display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+    padding: 9px 12px; margin-bottom: 6px; font-size: 13px;
   }
-  .tipo-opcao.ativo { background: var(--accent); color: #0A1B2E; border-color: var(--accent); font-weight: 600; }
-  .linha-acoes { display: flex; gap: 8px; }
-  .botao-acao {
-    flex: 1; padding: 12px; border-radius: 10px; border: none;
-    font-size: 14px; font-weight: 600; cursor: pointer;
+  .item-pendente .nome { font-weight: 600; }
+  .item-pendente .detalhe { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .botao-registar-mini {
+    flex-shrink: 0; padding: 7px 12px; border-radius: 8px; border: none;
+    background: var(--accent); color: #0C2340; font-size: 12px; font-weight: 700; cursor: pointer;
   }
-  .botao-acao.entrada { background: var(--sucesso); color: #08331a; }
-  .botao-acao.saida { background: var(--erro); color: #3a0b0b; }
 
   .estado-carregamento { text-align: center; color: var(--muted); padding: 40px 0; font-size: 14px; }
-
-  .secao-extra { margin-top: 14px; }
+  .secao-extra { margin-top: 18px; }
   .botao-secao-extra {
     width: 100%; text-align: left; padding: 12px 14px; border-radius: 10px;
     border: 1px solid var(--border); background: var(--card); color: var(--text);
@@ -152,30 +163,21 @@
   }
   .painel-secao-extra { display: none; margin-top: 8px; }
   .painel-secao-extra.aberto { display: block; }
-
   .linha-recente {
     display: flex; justify-content: space-between; align-items: center; gap: 10px;
     background: var(--card); border: 1px solid var(--border); border-radius: 10px;
     padding: 10px 12px; margin-bottom: 6px; font-size: 13px;
   }
   .linha-recente .detalhe-recente { font-size: 11px; color: var(--muted); margin-top: 2px; }
-  .linha-recente .tag-acao {
-    font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 999px; margin-right: 6px;
-  }
+  .linha-recente .tag-acao { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 999px; margin-right: 6px; }
   .linha-recente .tag-acao.entrada { background: var(--sucesso); color: #08331a; }
   .linha-recente .tag-acao.saida { background: var(--erro); color: #3a0b0b; }
   .botao-anular {
     flex-shrink: 0; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--erro);
     background: none; color: var(--erro); font-size: 11px; font-weight: 700; cursor: pointer;
   }
-
-  .cabecalho-faltam { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 12px; color: var(--muted); }
-  .lista-faltam { max-height: 320px; overflow-y: auto; }
-  .item-falta {
-    background: var(--card); border: 1px solid var(--border); border-radius: 8px;
-    padding: 8px 12px; margin-bottom: 6px; font-size: 13px;
-  }
 </style>
+<link rel="stylesheet" href="jenc-estilo.css">
 </head>
 <body>
   <div class="fundo-foto" aria-hidden="true"></div>
@@ -187,62 +189,57 @@
       <p class="sub" id="saudacao-staff">A carregar…</p>
     </div>
     <div style="display:flex; gap:8px;">
-      <a href="staff-inicio.html" style="background:none; border:1px solid var(--border); color:var(--muted); font-size:14px; padding:6px 10px; border-radius:8px; text-decoration:none;" title="Início">🏠</a>
+      <a href="staff-inicio.html" style="background:none; border:1px solid var(--border); color:var(--muted); font-size:14px; padding:6px 10px; border-radius:8px; text-decoration:none;" title="Início"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5 12 4l8 7.5M6 10v9a1 1 0 0 0 1 1h3v-6h4v6h3a1 1 0 0 0 1-1v-9"/></svg></a>
       <button class="sair" onclick="terminarSessaoStaff()">Sair</button>
     </div>
   </header>
 
-  <div id="aviso-camara" class="aviso-camara"></div>
-  <div id="reader"></div>
+  <p class="passo">1. ESCOLHE O TIPO DE CHECK-IN</p>
+  <div class="linha-tipo" id="linha-tipo">
+    <div class="tipo-opcao" data-tipo="evento" onclick="escolherTipo('evento')">Evento</div>
+    <div class="tipo-opcao" data-tipo="alojamento" onclick="escolherTipo('alojamento')">Alojamento</div>
+    <div class="tipo-opcao" data-tipo="almoco" onclick="escolherTipo('almoco')">Almoço</div>
+    <div class="tipo-opcao" data-tipo="jantar" onclick="escolherTipo('jantar')">Jantar</div>
+  </div>
+  <div class="linha-tipo">
+    <div class="tipo-opcao ativo" data-acao="entrada" onclick="escolherAcao('entrada')">✓ Entrada</div>
+    <div class="tipo-opcao acao-saida" data-acao="saida" onclick="escolherAcao('saida')">✕ Saída</div>
+  </div>
+  <div class="estado-modo" id="estado-modo">Escolhe o tipo de check-in para começar.</div>
 
-  <div class="entrada-manual">
-    <input type="text" id="input-manual" placeholder="Ou escreve o código (ex: JENC-001)">
-    <button onclick="procurarManual()">Procurar</button>
+  <div id="zona-leitura" class="bloqueado">
+    <p class="passo">2. LÊ O QR CODE OU ESCREVE O CÓDIGO</p>
+    <div id="aviso-camara" class="aviso-camara"></div>
+    <div id="reader"></div>
+
+    <div class="entrada-manual" style="margin-bottom:14px;">
+      <input type="text" id="input-manual" placeholder="Ou escreve o código (ex: JENC-001)" autocomplete="off">
+      <button onclick="registarManual()">Registar</button>
+    </div>
   </div>
 
   <div class="mensagem" id="mensagem"></div>
 
-  <div class="cartao-perfil" id="cartao-perfil">
-    <div class="nome" id="p-nome">—</div>
-    <div class="junior" id="p-junior">—</div>
-
-    <div class="linha-perfil"><span class="rotulo">Universidade</span><span class="valor" id="p-universidade">—</span></div>
-    <div class="linha-perfil"><span class="rotulo">Restrições alimentares</span><span class="valor" id="p-restricoes">—</span></div>
-    <div class="linha-perfil"><span class="rotulo">Alojamento</span><span class="valor" id="p-alojamento">—</span></div>
-    <div class="linha-perfil"><span class="rotulo">Quarto</span><span class="valor" id="p-quarto">—</span></div>
-    <div class="linha-perfil"><span class="rotulo">Turno refeição</span><span class="valor" id="p-turno">—</span></div>
-
-    <div class="agenda-hoje">
-      <h4>PROGRAMA DE HOJE</h4>
-      <div id="p-agenda"></div>
-    </div>
-
-    <div class="acoes-checkin">
-      <h4 style="font-size:12px; color:var(--muted); margin:0 0 8px;">1. ESCOLHE O TIPO DE CHECK-IN</h4>
-      <div class="linha-tipo">
-        <div class="tipo-opcao ativo" data-tipo="evento" onclick="escolherTipo('evento')">Evento</div>
-        <div class="tipo-opcao" data-tipo="alojamento" onclick="escolherTipo('alojamento')">Alojamento</div>
-        <div class="tipo-opcao" data-tipo="almoco" onclick="escolherTipo('almoco')">Almoço</div>
-        <div class="tipo-opcao" data-tipo="jantar" onclick="escolherTipo('jantar')">Jantar</div>
-      </div>
-      <div id="tipo-confirmado" style="font-size:12px; color: var(--accent); margin-bottom:14px;">Tipo selecionado: Evento</div>
-
-      <h4 style="font-size:12px; color:var(--muted); margin:0 0 8px;">2. REGISTA A ENTRADA OU SAÍDA</h4>
-      <div class="linha-acoes">
-        <button class="botao-acao entrada" onclick="registarCheckin('entrada')">✓ Entrada</button>
-        <button class="botao-acao saida" onclick="registarCheckin('saida')">✕ Saída</button>
-      </div>
-    </div>
+  <div class="cartao-resultado" id="cartao-resultado">
+    <div class="estado-res" id="res-estado">—</div>
+    <div class="nome" id="res-nome">—</div>
+    <div class="junior" id="res-junior">—</div>
+    <div id="res-linhas"></div>
   </div>
 
+  <p class="passo">POR REGISTAR</p>
+  <div class="filtros">
+    <select id="filtro-junior" onchange="aoMudarFiltro()">
+      <option value="">Todas as júnior empresas</option>
+    </select>
+    <input type="text" id="filtro-nome" placeholder="Procurar nome ou código…" oninput="renderLista()">
+  </div>
+  <div class="cabecalho-lista"><span id="contador-lista">—</span></div>
+  <div class="lista-pendentes" id="lista-pendentes"></div>
+
   <div class="secao-extra">
-    <button class="botao-secao-extra" onclick="alternarSecao('recentes')">🕓 Correções recentes (anular um check-in) ▾</button>
+    <button class="botao-secao-extra" onclick="alternarRecentes()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg> Correções recentes (anular um check-in) ▾</button>
     <div class="painel-secao-extra" id="painel-recentes"></div>
-  </div>
-
-  <div class="secao-extra">
-    <button class="botao-secao-extra" onclick="alternarSecao('faltam')">❗ Quem falta registar ▾</button>
-    <div class="painel-secao-extra" id="painel-faltam"></div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -250,11 +247,26 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 
   <script>
+    const ROTULOS_TIPO = { evento: 'Evento', alojamento: 'Alojamento', almoco: 'Almoço', jantar: 'Jantar', refeicao: 'Refeição' };
+    const SEM_JUNIOR = '__sem__';
+
     let staffAtual = null;
-    let participanteAtual = null;
-    let tipoSelecionado = 'evento';
+    let participantes = [];            // todos os participantes (carregados 1x)
+    let porCodigo = new Map();         // QR (maiúsculas) -> participante
+    let alojamentosMap = new Map();    // id -> nome
+    let quartosMap = new Map();        // id -> numero
+    let tipoSelecionado = null;        // só fica definido depois de o staff escolher
+    let acaoSelecionada = 'entrada';
+    let comEntrada = new Set();        // participante_id com entrada neste tipo
+    let comSaida = new Set();          // participante_id com saída neste tipo
+    let aProcessar = false;            // trava contra leituras repetidas
+    let ultimoCodigo = null, ultimoCodigoEm = 0;
 
     init();
+
+    function esc(t) {
+      return String(t ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
 
     async function init() {
       const user = await exigirSessaoStaff();
@@ -265,21 +277,176 @@
         document.getElementById('saudacao-staff').textContent = 'Conta sem acesso de staff.';
         return;
       }
+      document.getElementById('saudacao-staff').textContent = `Olá, ${staffAtual.nome ?? 'staff'} `;
 
-      document.getElementById('saudacao-staff').textContent = `Olá, ${staffAtual.nome ?? 'staff'} 👋`;
+      await carregarBase();
+      preencherFiltroJunior();
+      renderLista();
       iniciarCamara();
+
     }
 
-    // -----------------------------------------------------------------
-    // Câmara (só funciona em https:// ou http://localhost — nunca em
-    // file://, por restrição de segurança do browser)
-    // -----------------------------------------------------------------
+    async function carregarBase() {
+      const [rp, ra, rq] = await Promise.all([
+        supabaseClient.from('participantes')
+          .select('id, nome, qr_code, junior_empresa, universidade, restricoes_alimentares, alojamento, quarto_id, turno_refeicao')
+          .order('nome', { ascending: true }),
+        supabaseClient.from('alojamentos').select('id, nome'),
+        supabaseClient.from('quartos').select('id, numero')
+      ]);
+
+      if (rp.error) {
+        console.error('Erro ao ir buscar participantes:', rp.error.message);
+        mostrarMensagem('Não foi possível carregar a lista de participantes.', 'erro');
+      }
+      participantes = rp.data ?? [];
+      porCodigo = new Map(participantes.filter(p => p.qr_code).map(p => [p.qr_code.trim().toUpperCase(), p]));
+      alojamentosMap = new Map((ra.data ?? []).map(a => [a.id, a.nome]));
+      quartosMap = new Map((rq.data ?? []).map(q => [q.id, q.numero]));
+    }
+
+    function preencherFiltroJunior() {
+      const sel = document.getElementById('filtro-junior');
+      const nomes = [...new Set(participantes.map(p => p.junior_empresa).filter(Boolean))]
+        .sort((a, b) => a.localeCompare(b, 'pt'));
+      nomes.forEach(n => {
+        const o = document.createElement('option');
+        o.value = n; o.textContent = n;
+        sel.appendChild(o);
+      });
+      if (participantes.some(p => !p.junior_empresa)) {
+        const o = document.createElement('option');
+        o.value = SEM_JUNIOR; o.textContent = 'Sem júnior empresa';
+        sel.appendChild(o);
+      }
+    }
+
+    // ------------------------------------------------------------
+    // Escolha do tipo / ação (passo 1)
+    // ------------------------------------------------------------
+    async function escolherTipo(tipo) {
+      tipoSelecionado = tipo;
+      document.querySelectorAll('[data-tipo]').forEach(el => el.classList.toggle('ativo', el.dataset.tipo === tipo));
+      atualizarEstadoModo();
+      await carregarFeitos();
+      renderLista();
+    }
+
+    async function escolherAcao(acao) {
+      acaoSelecionada = acao;
+      document.querySelectorAll('[data-acao]').forEach(el => el.classList.toggle('ativo', el.dataset.acao === acao));
+      atualizarEstadoModo();
+      renderLista();
+    }
+
+    function atualizarEstadoModo() {
+      const el = document.getElementById('estado-modo');
+      const zona = document.getElementById('zona-leitura');
+      if (!tipoSelecionado) {
+        el.textContent = 'Escolhe o tipo de check-in para começar.';
+        el.className = 'estado-modo';
+        zona.classList.add('bloqueado');
+        return;
+      }
+      el.textContent = `A registar: ${ROTULOS_TIPO[tipoSelecionado]} · ${acaoSelecionada === 'entrada' ? 'Entrada' : 'Saída'}`;
+      el.className = 'estado-modo pronto';
+      zona.classList.remove('bloqueado');
+    }
+
+    async function carregarFeitos() {
+      comEntrada = new Set();
+      comSaida = new Set();
+      if (!tipoSelecionado) return;
+
+      const { data, error } = await supabaseClient
+        .from('checkins')
+        .select('participante_id, acao')
+        .eq('tipo', tipoSelecionado);
+
+      if (error) {
+        console.error('Erro ao ir buscar check-ins:', error.message, error.details, error.hint);
+        mostrarMensagem('Não foi possível carregar os check-ins já feitos.', 'erro');
+        return;
+      }
+      (data ?? []).forEach(c => (c.acao === 'entrada' ? comEntrada : comSaida).add(c.participante_id));
+    }
+
+    // ------------------------------------------------------------
+    // Lista "Por registar" (+ filtro por júnior empresa)
+    // ------------------------------------------------------------
+    function passaFiltroJunior(p) {
+      const f = document.getElementById('filtro-junior').value;
+      if (!f) return true;
+      return f === SEM_JUNIOR ? !p.junior_empresa : p.junior_empresa === f;
+    }
+
+    function aMudarFiltroRecentes() {
+      if (document.getElementById('painel-recentes').classList.contains('aberto')) carregarRecentes();
+    }
+    function aoMudarFiltro() { renderLista(); aMudarFiltroRecentes(); }
+
+    function renderLista() {
+      const lista = document.getElementById('lista-pendentes');
+      const contador = document.getElementById('contador-lista');
+      lista.innerHTML = '';
+
+      if (!tipoSelecionado) {
+        contador.textContent = '';
+        lista.innerHTML = '<div class="estado-carregamento" style="padding:20px 0;">Escolhe o tipo de check-in acima para veres quem falta.</div>';
+        return;
+      }
+
+      const pesquisa = document.getElementById('filtro-nome').value.trim().toLowerCase();
+      const doGrupo = participantes.filter(passaFiltroJunior);
+
+      // Entrada: quem ainda não tem entrada. Saída: quem tem entrada mas ainda não saiu.
+      const pendente = p => acaoSelecionada === 'entrada'
+        ? !comEntrada.has(p.id)
+        : comEntrada.has(p.id) && !comSaida.has(p.id);
+
+      const pendentes = doGrupo.filter(pendente);
+      const visiveis = pendentes.filter(p =>
+        !pesquisa ||
+        (p.nome ?? '').toLowerCase().includes(pesquisa) ||
+        (p.qr_code ?? '').toLowerCase().includes(pesquisa)
+      );
+
+      const feitos = acaoSelecionada === 'entrada'
+        ? doGrupo.filter(p => comEntrada.has(p.id)).length
+        : doGrupo.filter(p => comSaida.has(p.id)).length;
+      contador.textContent = `${pendentes.length} por registar · ${feitos} já registados (${doGrupo.length} no total)`;
+
+      if (visiveis.length === 0) {
+        lista.innerHTML = `<div class="estado-carregamento" style="padding:20px 0;">${
+          pendentes.length === 0 ? 'Ninguém por registar aqui. ' : 'Ninguém encontrado com essa pesquisa.'
+        }</div>`;
+        return;
+      }
+
+      visiveis.forEach(p => {
+        const item = document.createElement('div');
+        item.className = 'item-pendente';
+        item.innerHTML = `
+          <div>
+            <div class="nome">${esc(p.nome)}</div>
+            <div class="detalhe">${esc([p.qr_code, p.junior_empresa].filter(Boolean).join(' · '))}</div>
+          </div>
+          <button class="botao-registar-mini">Registar</button>
+        `;
+        item.querySelector('button').addEventListener('click', () => registarParticipante(p));
+        lista.appendChild(item);
+      });
+    }
+
+    // ------------------------------------------------------------
+    // Câmara + código manual (passo 2) — registam logo, sem passo extra
+    // ------------------------------------------------------------
     function iniciarCamara() {
       const aviso = document.getElementById('aviso-camara');
 
       if (location.protocol === 'file:') {
         aviso.style.display = 'block';
-        aviso.textContent = 'A câmara não funciona a abrir o ficheiro diretamente (file://). Usa o campo manual abaixo, ou corre este ficheiro num servidor local (ex: Live Server / localhost) para testares a câmara.';
+        aviso.textContent = 'A câmara não funciona a abrir o ficheiro diretamente (file://). Usa o campo manual, a lista abaixo, ou corre isto num servidor (https/localhost).';
         return;
       }
 
@@ -288,175 +455,192 @@
         html5QrCode.start(
           { facingMode: 'environment' },
           { fps: 10, qrbox: 240 },
-          (codigoLido) => processarCodigo(codigoLido),
-          () => {} // ignora erros de frame sem QR (é normal, acontece a cada frame sem código visível)
+          (codigoLido) => aoLerCodigo(codigoLido),
+          () => {}
         ).catch(() => {
           aviso.style.display = 'block';
-          aviso.textContent = 'Não foi possível aceder à câmara. Usa o campo manual abaixo.';
+          aviso.textContent = 'Não foi possível aceder à câmara. Usa o campo manual ou a lista abaixo.';
         });
       } catch (e) {
         aviso.style.display = 'block';
-        aviso.textContent = 'Não foi possível aceder à câmara. Usa o campo manual abaixo.';
+        aviso.textContent = 'Não foi possível aceder à câmara. Usa o campo manual ou a lista abaixo.';
       }
     }
 
-    function procurarManual() {
+    function registarManual() {
       const codigo = document.getElementById('input-manual').value.trim();
-      if (codigo) processarCodigo(codigo);
+      if (codigo) aoLerCodigo(codigo, true);
     }
 
-    // -----------------------------------------------------------------
-    async function processarCodigo(codigo) {
-      mostrarMensagem('A procurar…');
-      document.getElementById('cartao-perfil').style.display = 'none';
+    async function aoLerCodigo(codigoBruto, manual = false) {
+      const codigo = String(codigoBruto).trim();
+      if (!tipoSelecionado) {
+        mostrarMensagem('Escolhe primeiro o tipo de check-in (passo 1).', 'erro');
+        return;
+      }
+      if (aProcessar) return;
 
-      const { data: participante, error } = await supabaseClient
-        .from('participantes')
-        .select('*')
-        .eq('qr_code', codigo)
-        .single();
+      // A câmara lê o mesmo QR várias vezes por segundo: ignora repetições seguidas.
+      const agora = Date.now();
+      if (!manual && codigo === ultimoCodigo && agora - ultimoCodigoEm < 4000) return;
+      ultimoCodigo = codigo;
+      ultimoCodigoEm = agora;
 
-      if (error || !participante) {
+      let p = porCodigo.get(codigo.toUpperCase());
+      if (!p) {
+        // Pode ser alguém adicionado depois de a página abrir.
+        const { data } = await supabaseClient.from('participantes')
+          .select('id, nome, qr_code, junior_empresa, universidade, restricoes_alimentares, alojamento, quarto_id, turno_refeicao')
+          .eq('qr_code', codigo).maybeSingle();
+        if (data) { p = data; participantes.push(p); porCodigo.set(codigo.toUpperCase(), p); }
+      }
+
+      if (!p) {
         mostrarMensagem(`Código "${codigo}" não encontrado.`, 'erro');
-        participanteAtual = null;
         return;
       }
 
-      participanteAtual = participante;
-      mostrarMensagem('');
-      await renderPerfil(participante);
+      const ok = await registarParticipante(p);
+      if (ok && manual) document.getElementById('input-manual').value = '';
     }
 
-    async function renderPerfil(p) {
-      document.getElementById('p-nome').textContent = p.nome ?? '—';
-      document.getElementById('p-junior').textContent = p.junior_empresa ?? '—';
-      document.getElementById('p-universidade').textContent = p.universidade ?? '—';
-
-      const elRestricoes = document.getElementById('p-restricoes');
-      elRestricoes.textContent = p.restricoes_alimentares || 'Nenhuma';
-      elRestricoes.className = 'valor' + (p.restricoes_alimentares && p.restricoes_alimentares !== 'Nenhuma' ? ' alerta' : '');
-
-      document.getElementById('p-turno').textContent = p.turno_refeicao ?? 'Não atribuído';
-
-      // Alojamento + quarto (mesma lógica usada nas outras páginas)
-      if (p.alojamento) {
-        const { data: alojamento } = await supabaseClient.from('alojamentos').select('nome').eq('id', p.alojamento).single();
-        document.getElementById('p-alojamento').textContent = alojamento?.nome ?? '—';
-      } else {
-        document.getElementById('p-alojamento').textContent = 'Não atribuído';
+    // ------------------------------------------------------------
+    // Registo (uma única função usada pela câmara, pelo código e pela lista)
+    // ------------------------------------------------------------
+    async function registarParticipante(p) {
+      if (!tipoSelecionado) {
+        mostrarMensagem('Escolhe primeiro o tipo de check-in (passo 1).', 'erro');
+        return false;
       }
+      if (aProcessar) return false;
+      aProcessar = true;
 
-      if (p.quarto_id) {
-        const { data: quarto } = await supabaseClient.from('quartos').select('numero').eq('id', p.quarto_id).single();
-        document.getElementById('p-quarto').textContent = quarto?.numero ?? '—';
-      } else {
-        document.getElementById('p-quarto').textContent = 'Não atribuído';
-      }
+      const tipo = tipoSelecionado;
+      const acao = acaoSelecionada;
+      const rotulo = `${ROTULOS_TIPO[tipo]} · ${acao === 'entrada' ? 'Entrada' : 'Saída'}`;
 
-      // Programa de hoje
-      const hoje = new Date().toISOString().split('T')[0];
-      const { data: atividades } = await supabaseClient
-        .from('atividades')
-        .select('nome, hora_inicio, local')
-        .eq('data', hoje)
-        .order('hora_inicio', { ascending: true });
+      try {
+        // Vê o estado REAL na base de dados (outro staff pode ter registado entretanto).
+        const { data: existentes, error: erroLer } = await supabaseClient
+          .from('checkins')
+          .select('acao, criado_em')
+          .eq('participante_id', p.id)
+          .eq('tipo', tipo);
 
-      const elAgenda = document.getElementById('p-agenda');
-      elAgenda.innerHTML = '';
-      if (!atividades || atividades.length === 0) {
-        elAgenda.innerHTML = '<div class="item-agenda">Sem atividades hoje.</div>';
-      } else {
-        atividades.forEach(a => {
-          const item = document.createElement('div');
-          item.className = 'item-agenda';
-          item.innerHTML = `<span class="hora">${a.hora_inicio?.slice(0,5) ?? '--:--'}</span><span>${a.nome} — 📍 ${a.local ?? '—'}</span>`;
-          elAgenda.appendChild(item);
+        if (erroLer) {
+          mostrarMensagem('Erro ao verificar: ' + erroLer.message, 'erro');
+          return false;
+        }
+
+        const jaEntrou = (existentes ?? []).find(c => c.acao === 'entrada');
+        const jaSaiu = (existentes ?? []).find(c => c.acao === 'saida');
+
+        if (acao === 'entrada' && jaEntrou) {
+          comEntrada.add(p.id); renderLista();
+          mostrarResultado(p, 'erro', `Já tem check-in (${rotulo}) às ${horaCurta(jaEntrou.criado_em)}`, tipo);
+          return false;
+        }
+        if (acao === 'saida' && !jaEntrou) {
+          mostrarResultado(p, 'erro', `Ainda não tem entrada (${ROTULOS_TIPO[tipo]}), por isso não pode ter saída`, tipo);
+          return false;
+        }
+        if (acao === 'saida' && jaSaiu) {
+          comSaida.add(p.id); renderLista();
+          mostrarResultado(p, 'erro', `Já tem saída (${ROTULOS_TIPO[tipo]}) às ${horaCurta(jaSaiu.criado_em)}`, tipo);
+          return false;
+        }
+
+        const { error } = await supabaseClient.from('checkins').insert({
+          participante_id: p.id,
+          // Se a tabela `checkins` só aceitar ids de staff em `lido_por`, a logística fica sem registo de quem leu.
+          lido_por: staffAtual.tipo_conta === 'logistica' ? null : staffAtual.id,
+          tipo,
+          acao
         });
-      }
 
-      document.getElementById('cartao-perfil').style.display = 'block';
+        if (error) {
+          if (error.code === '23505') {
+            mostrarResultado(p, 'erro', `Já tem este registo (${rotulo})`, tipo);
+            await carregarFeitos(); renderLista();
+          } else {
+            console.error('Erro ao registar check-in:', error);
+            mostrarMensagem('Erro ao registar: ' + error.message + (error.hint ? ' — ' + error.hint : ''), 'erro');
+          }
+          return false;
+        }
+
+        (acao === 'entrada' ? comEntrada : comSaida).add(p.id);
+        mostrarMensagem('');
+        mostrarResultado(p, 'ok', `✓ ${rotulo} registada`, tipo);
+        renderLista(); // a pessoa desaparece da lista "Por registar"
+        if (document.getElementById('painel-recentes').classList.contains('aberto')) carregarRecentes();
+        return true;
+      } finally {
+        aProcessar = false;
+      }
     }
 
-    const ROTULOS_TIPO = { evento: 'Evento', alojamento: 'Alojamento', almoco: 'Almoço', jantar: 'Jantar', refeicao: 'Refeição' };
-
-    function escolherTipo(tipo) {
-      tipoSelecionado = tipo;
-      document.querySelectorAll('.tipo-opcao').forEach(el => {
-        el.classList.toggle('ativo', el.dataset.tipo === tipo);
-      });
-      document.getElementById('tipo-confirmado').textContent = `Tipo selecionado: ${ROTULOS_TIPO[tipo]}`;
-
-      if (document.getElementById('painel-faltam').classList.contains('aberto')) {
-        carregarQuemFalta();
-      }
+    function horaCurta(iso) {
+      return new Date(iso).toLocaleString('pt-PT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
     }
 
-    async function registarCheckin(acao) {
-      if (!participanteAtual) {
-        mostrarMensagem('Procura primeiro um participante (câmara ou código manual).', 'erro');
-        return;
+    function mostrarResultado(p, estado, texto, tipo) {
+      const cartao = document.getElementById('cartao-resultado');
+      cartao.className = 'cartao-resultado ' + estado;
+      document.getElementById('res-estado').textContent = texto;
+      document.getElementById('res-nome').textContent = p.nome ?? '—';
+      document.getElementById('res-junior').textContent = p.junior_empresa ?? '—';
+
+      const linhas = [];
+      const restr = p.restricoes_alimentares && p.restricoes_alimentares !== 'Nenhuma' ? p.restricoes_alimentares : null;
+      if (tipo === 'almoco' || tipo === 'jantar' || tipo === 'refeicao') {
+        linhas.push(['Restrições alimentares', restr ?? 'Nenhuma', !!restr]);
+        linhas.push(['Turno refeição', p.turno_refeicao ?? 'Não atribuído', false]);
+      } else if (tipo === 'alojamento') {
+        linhas.push(['Alojamento', p.alojamento ? (alojamentosMap.get(p.alojamento) ?? '—') : 'Não atribuído', false]);
+        linhas.push(['Quarto', p.quarto_id ? (quartosMap.get(p.quarto_id) ?? '—') : 'Não atribuído', false]);
+      } else {
+        linhas.push(['Universidade', p.universidade ?? '—', false]);
+        if (restr) linhas.push(['Restrições alimentares', restr, true]);
       }
 
-      const nomeParticipante = participanteAtual.nome;
-
-      console.log('A registar check-in com:', { participante_id: participanteAtual.id, lido_por: staffAtual.id, tipo: tipoSelecionado, acao });
-
-      const { error } = await supabaseClient.from('checkins').insert({
-        participante_id: participanteAtual.id,
-        lido_por: staffAtual.id,
-        tipo: tipoSelecionado,
-        acao: acao
-      });
-
-      if (error) {
-        console.error('Erro ao registar check-in:', error);
-        mostrarMensagem('Erro ao registar: ' + error.message + (error.hint ? ' — ' + error.hint : ''), 'erro');
-        return;
-      }
-
-      mostrarMensagem(
-        `${acao === 'entrada' ? 'Entrada' : 'Saída'} registada para ${nomeParticipante} (${ROTULOS_TIPO[tipoSelecionado]}).`,
-        'sucesso'
-      );
-
-      // Prepara o ecrã para o próximo participante
-      participanteAtual = null;
-      document.getElementById('cartao-perfil').style.display = 'none';
-      document.getElementById('input-manual').value = '';
-      escolherTipo('evento');
-
-      // Mantém a secção de correções recentes atualizada, se estiver aberta
-      // (a de "quem falta" já é atualizada dentro de escolherTipo('evento') acima)
-      if (document.getElementById('painel-recentes').classList.contains('aberto')) carregarRecentes();
+      document.getElementById('res-linhas').innerHTML = linhas.map(([r, v, alerta]) =>
+        `<div class="linha-perfil"><span class="rotulo">${esc(r)}</span><span class="valor${alerta ? ' alerta' : ''}">${esc(v)}</span></div>`
+      ).join('');
+      cartao.style.display = 'block';
     }
 
-    // -----------------------------------------------------------------
-    // Correções recentes: mostra os últimos check-ins e deixa anular.
-    // -----------------------------------------------------------------
-    function alternarSecao(nome) {
-      const painel = document.getElementById(`painel-${nome}`);
+    // ------------------------------------------------------------
+    // Correções recentes (anular) — respeita o filtro de júnior empresa
+    // ------------------------------------------------------------
+    function alternarRecentes() {
+      const painel = document.getElementById('painel-recentes');
       const abrir = !painel.classList.contains('aberto');
       painel.classList.toggle('aberto', abrir);
-      if (abrir && nome === 'recentes') carregarRecentes();
-      if (abrir && nome === 'faltam') carregarQuemFalta();
+      if (abrir) carregarRecentes();
     }
 
     async function carregarRecentes() {
       const painel = document.getElementById('painel-recentes');
       painel.innerHTML = '<div class="estado-carregamento" style="padding:14px 0;">A carregar…</div>';
 
-      const { data, error } = await supabaseClient
+      const filtro = document.getElementById('filtro-junior').value;
+      let query = supabaseClient
         .from('checkins')
-        .select('id, tipo, acao, criado_em, participantes(nome)')
+        .select(`id, tipo, acao, criado_em, participantes${filtro ? '!inner' : ''}(nome, junior_empresa)`)
         .order('criado_em', { ascending: false })
         .limit(15);
+
+      if (filtro && filtro !== SEM_JUNIOR) query = query.eq('participantes.junior_empresa', filtro);
+      if (filtro === SEM_JUNIOR) query = query.is('participantes.junior_empresa', null);
+
+      const { data, error } = await query;
 
       if (error) {
         painel.innerHTML = '<div class="estado-carregamento" style="padding:14px 0;">Não foi possível carregar.</div>';
         console.error('Erro ao ir buscar check-ins recentes:', error.message, error.details, error.hint);
         return;
       }
-
       if (!data || data.length === 0) {
         painel.innerHTML = '<div class="estado-carregamento" style="padding:14px 0;">Ainda não há check-ins registados.</div>';
         return;
@@ -464,21 +648,22 @@
 
       painel.innerHTML = '';
       data.forEach(c => {
-        const hora = new Date(c.criado_em).toLocaleString('pt-PT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
         const linha = document.createElement('div');
         linha.className = 'linha-recente';
         linha.innerHTML = `
           <div>
-            <div><span class="tag-acao ${c.acao}">${c.acao === 'entrada' ? 'Entrada' : 'Saída'}</span>${c.participantes?.nome ?? 'Participante removido'}</div>
-            <div class="detalhe-recente">${ROTULOS_TIPO[c.tipo] ?? c.tipo} · ${hora}</div>
+            <div><span class="tag-acao ${c.acao}">${c.acao === 'entrada' ? 'Entrada' : 'Saída'}</span>${esc(c.participantes?.nome ?? 'Participante removido')}</div>
+            <div class="detalhe-recente">${esc(ROTULOS_TIPO[c.tipo] ?? c.tipo)} · ${horaCurta(c.criado_em)}</div>
           </div>
-          <button class="botao-anular" onclick="anularCheckin('${c.id}')">Anular</button>
+          <button class="botao-anular">Anular</button>
         `;
+        linha.querySelector('button').addEventListener('click', () => anularCheckin(c.id));
         painel.appendChild(linha);
       });
     }
 
     async function anularCheckin(checkinId) {
+      if (!confirm('Anular este check-in?')) return;
       const { error } = await supabaseClient.from('checkins').delete().eq('id', checkinId);
       if (error) {
         mostrarMensagem('Erro ao anular: ' + error.message, 'erro');
@@ -486,55 +671,8 @@
       }
       mostrarMensagem('Check-in anulado.', 'sucesso');
       await carregarRecentes();
-      if (document.getElementById('painel-faltam').classList.contains('aberto')) carregarQuemFalta();
-    }
-
-    // -----------------------------------------------------------------
-    // Quem falta registar (para o tipo atualmente selecionado acima).
-    // -----------------------------------------------------------------
-    async function carregarQuemFalta() {
-      const painel = document.getElementById('painel-faltam');
-      painel.innerHTML = '<div class="estado-carregamento" style="padding:14px 0;">A carregar…</div>';
-
-      const { data: todos, error: erroTodos } = await supabaseClient
-        .from('participantes')
-        .select('id, nome')
-        .order('nome', { ascending: true });
-
-      const { data: jaFeitos, error: erroFeitos } = await supabaseClient
-        .from('checkins')
-        .select('participante_id')
-        .eq('tipo', tipoSelecionado)
-        .eq('acao', 'entrada');
-
-      if (erroTodos || erroFeitos) {
-        painel.innerHTML = '<div class="estado-carregamento" style="padding:14px 0;">Não foi possível carregar.</div>';
-        console.error('Erro ao ir buscar quem falta:', erroTodos || erroFeitos);
-        return;
-      }
-
-      const feitosSet = new Set((jaFeitos ?? []).map(c => c.participante_id));
-      const faltam = (todos ?? []).filter(p => !feitosSet.has(p.id));
-
-      painel.innerHTML = `
-        <div class="cabecalho-faltam">
-          <span>Faltam ${faltam.length} de ${todos.length} (${ROTULOS_TIPO[tipoSelecionado]})</span>
-        </div>
-        <div class="lista-faltam" id="lista-faltam"></div>
-      `;
-
-      const lista = document.getElementById('lista-faltam');
-      if (faltam.length === 0) {
-        lista.innerHTML = '<div class="item-falta">Toda a gente já está registada! 🎉</div>';
-        return;
-      }
-
-      faltam.forEach(p => {
-        const item = document.createElement('div');
-        item.className = 'item-falta';
-        item.textContent = p.nome;
-        lista.appendChild(item);
-      });
+      await carregarFeitos();   // a pessoa volta à lista "Por registar"
+      renderLista();
     }
 
     function mostrarMensagem(texto, tipo) {
@@ -548,6 +686,8 @@
       window.location.href = 'login.html';
     }
   </script>
+
+  <script src="jenc-ui.js"></script>
 
 </body>
 </html>

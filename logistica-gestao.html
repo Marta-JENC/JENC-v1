@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestão — Logística JENC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="jenc-tema.css">
+<style>
+  :root {
+    --bg: #0C2340;
+    --card: rgba(22, 55, 95, 0.46);
+    --accent: #BD8C1C;
+    --text: #F6F1E4;
+    --muted: #93A6BF;
+    --border: rgba(189, 140, 28, 0.24);
+    --erro: #E8877A;
+    --sucesso: #8FCB9B;
+  }
+  * { box-sizing: border-box; }
+  .fundo-foto {
+    position: fixed; inset: 0; z-index: -2;
+    background-image: url("jenc-fundo.png");
+    background-size: 640px auto;
+    background-position: top center;
+    background-repeat: repeat;
+  }
+  .fundo-veu {
+    position: fixed; inset: 0; z-index: -1;
+    background: linear-gradient(180deg, rgba(12,35,64,0.55) 0%, rgba(12,35,64,0.72) 55%, rgba(12,35,64,0.88) 100%);
+  }
+  .card, [class*="card"], [class*="item-"], [class*="aba"], input, select {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+  h1, h2 { font-family: 'Montserrat', sans-serif; font-weight: 700; letter-spacing: -0.015em; }
+  body {
+    margin: 0;
+    font-family: 'Montserrat', 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 20px 16px 90px;
+    max-width: 560px;
+    margin-inline: auto;
+  }
+  header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 18px; }
+  h1 { font-size: 22px; margin: 0; }
+  .sub { color: var(--muted); font-size: 13px; margin: 4px 0 0; }
+  .nav-topo { display: flex; gap: 8px; }
+  .nav-topo a, .nav-topo button {
+    background:none; border:1px solid var(--border); color:var(--muted);
+    font-size:14px; padding:6px 10px; border-radius:8px; cursor:pointer; text-decoration:none;
+  }
+
+  .abas-vista { display: flex; gap: 8px; margin-bottom: 20px; }
+  .aba-vista {
+    flex: 1; text-align: center; padding: 10px; border-radius: 10px;
+    background: var(--card); border: 1px solid var(--border);
+    color: var(--muted); font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  .aba-vista.ativa { background: var(--accent); color: #0C2340; border-color: var(--accent); }
+  .secao-vista { display: none; }
+  .secao-vista.ativa { display: block; }
+
+  .form-novo {
+    background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+    padding: 16px; margin-bottom: 20px;
+  }
+  .form-novo h3 { font-size: 13px; color: var(--muted); margin: 0 0 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+  .campos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .campo-largo { grid-column: 1 / -1; }
+  label { font-size: 11px; color: var(--muted); display: block; margin: 0 0 4px; }
+  input, select {
+    width: 100%; padding: 10px 12px; border-radius: 8px;
+    border: 1px solid var(--border); background: rgba(12,35,64,0.55); color: var(--text);
+    font-size: 13px;
+  }
+  input:focus, select:focus { outline: none; border-color: var(--accent); }
+  button.principal {
+    margin-top: 14px; padding: 11px 18px; border: none; border-radius: 10px;
+    background: var(--accent); color: #0C2340; font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+  button.principal:disabled { opacity: 0.6; cursor: default; }
+
+  .item-registo {
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 14px 16px; margin-bottom: 10px;
+  }
+  .item-registo .linha-topo { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+  .item-registo .nome { font-size: 14px; font-weight: 700; }
+  .item-registo .detalhe { font-size: 12px; color: var(--muted); margin-top: 3px; line-height: 1.5; }
+  .acoes-item { display: flex; gap: 6px; flex-shrink: 0; }
+  .acoes-item button {
+    background: none; border: 1px solid var(--border); color: var(--muted);
+    font-size: 12px; padding: 5px 10px; border-radius: 7px; cursor: pointer;
+  }
+  .acoes-item button.apagar { color: var(--erro); border-color: var(--erro); }
+  .acoes-item button.guardar { color: #0C2340; background: var(--accent); border-color: var(--accent); font-weight: 700; }
+
+  .mensagem { font-size: 13px; margin: 10px 0; min-height: 18px; }
+  .mensagem.erro { color: var(--erro); }
+  .mensagem.sucesso { color: var(--sucesso); }
+
+  .vazio, .estado-carregamento { text-align: center; color: var(--muted); padding: 30px 0; font-size: 14px; }
+</style>
+<link rel="stylesheet" href="jenc-estilo.css">
+</head>
+<body>
+  <div class="fundo-foto" aria-hidden="true"></div>
+  <div class="fundo-veu" aria-hidden="true"></div>
+
+  <header>
+    <div>
+      <h1>Gestão de Conteúdo</h1>
+      <p class="sub">Agenda, salas, turnos e coffee breaks — edita à vontade.</p>
+    </div>
+    <div class="nav-topo">
+      <a href="logistica-inicio.html" title="Início"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5 12 4l8 7.5M6 10v9a1 1 0 0 0 1 1h3v-6h4v6h3a1 1 0 0 0 1-1v-9"/></svg></a>
+      <button onclick="terminarSessaoLogistica()">Sair</button>
+    </div>
+  </header>
+
+  <div class="estado-carregamento" id="carregamento">A carregar…</div>
+
+  <div id="conteudo" style="display:none;">
+
+    <!-- ===================== AGENDA / ATIVIDADES ===================== -->
+    <section class="secao-vista" data-vista="agenda" id="secao-agenda">
+      <div class="form-novo">
+        <h3>Nova atividade</h3>
+        <div class="campos-grid">
+          <div class="campo-largo">
+            <label>Nome</label>
+            <input type="text" id="nova-ativ-nome" placeholder="Ex: Workshop de Negociação">
+          </div>
+          <div>
+            <label>Data</label>
+            <input type="date" id="nova-ativ-data">
+          </div>
+          <div>
+            <label>Sala / Local</label>
+            <input type="text" id="nova-ativ-local" placeholder="Ex: Auditório 2">
+          </div>
+          <div>
+            <label>Hora de início</label>
+            <input type="time" id="nova-ativ-inicio">
+          </div>
+          <div>
+            <label>Hora de fim</label>
+            <input type="time" id="nova-ativ-fim">
+          </div>
+          <div>
+            <label>Capacidade</label>
+            <input type="text" inputmode="numeric" id="nova-ativ-capacidade" placeholder="Ex: 80">
+          </div>
+          <div>
+            <label>Responsável (staff)</label>
+            <select id="nova-ativ-responsavel"><option value="">— por atribuir —</option></select>
+          </div>
+        </div>
+        <button class="principal" onclick="criarAtividade()">+ Adicionar atividade</button>
+        <div class="mensagem" id="msg-agenda"></div>
+      </div>
+
+      <div id="lista-atividades"></div>
+      <div class="vazio" id="agenda-vazio" style="display:none;">Ainda não há atividades criadas.</div>
+    </section>
+
+    <!-- ===================== TURNOS / COFFEE BREAKS ===================== -->
+    <section class="secao-vista" data-vista="turnos" id="secao-turnos">
+      <div class="form-novo">
+        <h3>Novo turno (refeição ou coffee break)</h3>
+        <div class="campos-grid">
+          <div class="campo-largo">
+            <label>Nome</label>
+            <input type="text" id="novo-turno-nome" placeholder="Ex: Coffee Break Manhã, Almoço Turno 1…">
+          </div>
+          <div>
+            <label>Hora de início</label>
+            <input type="time" id="novo-turno-inicio">
+          </div>
+          <div>
+            <label>Hora de fim</label>
+            <input type="time" id="novo-turno-fim">
+          </div>
+          <div class="campo-largo">
+            <label>Local</label>
+            <input type="text" id="novo-turno-local" placeholder="Ex: Foyer, Terraço…">
+          </div>
+          <div class="campo-largo">
+            <label>Responsável (staff)</label>
+            <select id="novo-turno-responsavel"><option value="">— por atribuir —</option></select>
+          </div>
+        </div>
+        <button class="principal" onclick="criarTurno()">+ Adicionar turno</button>
+        <div class="mensagem" id="msg-turnos"></div>
+      </div>
+
+      <div id="lista-turnos"></div>
+      <div class="vazio" id="turnos-vazio" style="display:none;">Ainda não há turnos criados.</div>
+
+      <div class="form-novo" style="margin-top:30px;">
+        <h3>Inventário &amp; Budget</h3>
+        <p style="font-size:12px; color:var(--muted); margin:-6px 0 14px;">
+          A lista de compras, o orçamento e o registo de compras passaram para uma página própria.
+        </p>
+        <a href="logistica-compras.html" class="card-nav destaque" style="display:block;">
+          <span class="icone"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.3 10a2 2 0 0 1-2 1.7H8.3a2 2 0 0 1-2-1.7L5 8ZM8.5 8V6.5a3.5 3.5 0 0 1 7 0V8"/></svg></span>
+          <div class="titulo">Abrir Compras &amp; Budget →</div>
+          <div class="descricao">Orçamento, lista de compras por momento e histórico de compras.</div>
+        </a>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- 1. Biblioteca do Supabase como script normal (não é módulo) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- 2. O teu cliente Supabase -->
+  <script src="supabaseClient.js"></script>
+
+  <script>
+    let atividades = [];
+    let turnos = [];
+    let staffLista = [];
+
+    init();
+
+    async function exigirSessaoLogistica() {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (!session) {
+        window.location.href = 'login.html';
+        return null;
+      }
+      return session.user;
+    }
+
+    async function getLogisticaAtual(user) {
+      const { data, error } = await supabaseClient
+        .from('logistica')
+        .select('id, nome, email')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Erro ao ir buscar dados da logística:', error.message, error.details, error.hint);
+        return null;
+      }
+      return data;
+    }
+
+    async function init() {
+      const user = await exigirSessaoLogistica();
+      if (!user) return;
+
+      const logistica = await getLogisticaAtual(user);
+      if (!logistica) {
+        document.getElementById('carregamento').textContent = 'Conta sem acesso de logística.';
+        return;
+      }
+
+      await Promise.all([carregarAtividades(), carregarTurnos(), carregarStaffLista()]);
+      preencherSelectsStaff();
+
+      document.getElementById('carregamento').style.display = 'none';
+      document.getElementById('conteudo').style.display = 'block';
+
+      const vistaInicial = (window.location.hash || '#agenda').replace('#', '');
+      mudarVista(['agenda', 'turnos'].includes(vistaInicial) ? vistaInicial : 'agenda');
+    }
+
+    function mudarVista(vista) {
+      document.querySelectorAll('.secao-vista').forEach(s => s.classList.toggle('ativa', s.dataset.vista === vista));
+      const titulos = {
+        agenda: ['Agenda & Salas', 'Cria, edita ou apaga atividades — hora, local, capacidade.'],
+        turnos: ['Turnos & Coffee Breaks', 'Edita horários, locais e inventário de refeições e coffee breaks.']
+      };
+      document.querySelector('header h1').textContent = titulos[vista][0];
+      document.querySelector('header .sub').textContent = titulos[vista][1];
+      document.title = titulos[vista][0] + ' — JENC';
+    }
+
+    function mostrarMensagem(id, texto, tipo) {
+      const el = document.getElementById(id);
+      el.textContent = texto;
+      el.className = 'mensagem' + (tipo ? ' ' + tipo : '');
+      if (tipo === 'sucesso') setTimeout(() => { el.textContent = ''; el.className = 'mensagem'; }, 3000);
+    }
+
+    // ===================== STAFF (para os dropdowns de responsável) =====================
+
+    async function carregarStaffLista() {
+      const { data, error } = await supabaseClient
+        .from('staff')
+        .select('id, nome')
+        .order('nome', { ascending: true });
+
+      if (error) {
+        console.error('Erro ao ir buscar lista de staff:', error.message, error.details, error.hint);
+        staffLista = [];
+        return;
+      }
+      staffLista = data ?? [];
+    }
+
+    function opcoesStaffHtml(nomeSelecionado) {
+      let html = `<option value="">— por atribuir —</option>`;
+      staffLista.forEach(s => {
+        const sel = s.nome === nomeSelecionado ? ' selected' : '';
+        html += `<option value="${s.nome}"${sel}>${s.nome}</option>`;
+      });
+      return html;
+    }
+
+    function preencherSelectsStaff() {
+      const selNovaAtiv = document.getElementById('nova-ativ-responsavel');
+      if (selNovaAtiv) selNovaAtiv.innerHTML = opcoesStaffHtml('');
+      const selNovoTurno = document.getElementById('novo-turno-responsavel');
+      if (selNovoTurno) selNovoTurno.innerHTML = opcoesStaffHtml('');
+    }
+
+    // ===================== ATIVIDADES =====================
+
+    async function carregarAtividades() {
+      const { data, error } = await supabaseClient
+        .from('atividades')
+        .select('id, nome, data, hora_inicio, hora_fim, local, capacidade, staff_responsavel')
+        .order('data', { ascending: true })
+        .order('hora_inicio', { ascending: true });
+
+      if (error) {
+        console.error('Erro ao ir buscar atividades:', error.message, error.details, error.hint);
+        mostrarMensagem('msg-agenda', 'Não foi possível carregar as atividades. Verifica as permissões (RLS) na Supabase.', 'erro');
+        return;
+      }
+      atividades = data ?? [];
+      renderAtividades();
+    }
+
+    async function criarAtividade() {
+      const nova = {
+        nome: document.getElementById('nova-ativ-nome').value.trim(),
+        data: document.getElementById('nova-ativ-data').value || null,
+        hora_inicio: document.getElementById('nova-ativ-inicio').value || null,
+        hora_fim: document.getElementById('nova-ativ-fim').value || null,
+        local: document.getElementById('nova-ativ-local').value.trim() || null,
+        capacidade: document.getElementById('nova-ativ-capacidade').value ? Number(document.getElementById('nova-ativ-capacidade').value) : null,
+        staff_responsavel: document.getElementById('nova-ativ-responsavel').value.trim() || null,
+      };
+
+      if (!nova.nome) {
+        mostrarMensagem('msg-agenda', 'Dá um nome à atividade.', 'erro');
+        return;
+      }
+
+      const { error } = await supabaseClient.from('atividades').insert(nova);
+      if (error) {
+        console.error(error);
+        mostrarMensagem('msg-agenda', 'Erro ao criar: ' + error.message, 'erro');
+        return;
+      }
+
+      ['nova-ativ-nome','nova-ativ-data','nova-ativ-local','nova-ativ-inicio','nova-ativ-fim','nova-ativ-capacidade','nova-ativ-responsavel']
+        .forEach(id => document.getElementById(id).value = '');
+
+      mostrarMensagem('msg-agenda', 'Atividade criada!', 'sucesso');
+      await carregarAtividades();
+    }
+
+    function renderAtividades() {
+      const container = document.getElementById('lista-atividades');
+      const vazio = document.getElementById('agenda-vazio');
+      container.innerHTML = '';
+
+      if (atividades.length === 0) {
+        vazio.style.display = 'block';
+        return;
+      }
+      vazio.style.display = 'none';
+
+      atividades.forEach(a => {
+        const item = document.createElement('div');
+        item.className = 'item-registo';
+        item.dataset.id = a.id;
+
+        item.innerHTML = `
+          <div class="linha-topo">
+            <div>
+              <div class="nome">${a.nome}</div>
+              <div class="detalhe">
+                <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 10h16M9 3v4M15 3v4"/></svg> ${a.data ?? '—'} · <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg> ${(a.hora_inicio ?? '--:--').slice(0,5)}${a.hora_fim ? ' – ' + a.hora_fim.slice(0,5) : ''}<br>
+                <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.1 7-11.5A7 7 0 0 0 5 9.5C5 14.9 12 21 12 21Z"/><circle cx="12" cy="9.3" r="2.3"/></svg> ${a.local ?? 'Local a anunciar'} ${a.capacidade ? '· Cap. ' + a.capacidade : ''}${a.staff_responsavel ? ' ·  ' + a.staff_responsavel : ''}
+              </div>
+            </div>
+            <div class="acoes-item">
+              <button onclick="editarAtividade('${a.id}')">Editar</button>
+              <button class="apagar" onclick="apagarAtividade('${a.id}')">Apagar</button>
+            </div>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function editarAtividade(id) {
+      const a = atividades.find(x => x.id === id);
+      if (!a) return;
+      const item = document.querySelector(`#lista-atividades .item-registo[data-id="${id}"]`);
+
+      item.innerHTML = `
+        <div class="campos-grid">
+          <div class="campo-largo"><label>Nome</label><input type="text" id="ed-nome-${id}" value="${a.nome ?? ''}"></div>
+          <div><label>Data</label><input type="date" id="ed-data-${id}" value="${a.data ?? ''}"></div>
+          <div><label>Sala / Local</label><input type="text" id="ed-local-${id}" value="${a.local ?? ''}"></div>
+          <div><label>Hora início</label><input type="time" id="ed-inicio-${id}" value="${(a.hora_inicio ?? '').slice(0,5)}"></div>
+          <div><label>Hora fim</label><input type="time" id="ed-fim-${id}" value="${(a.hora_fim ?? '').slice(0,5)}"></div>
+          <div><label>Capacidade</label><input type="text" inputmode="numeric" id="ed-capacidade-${id}" value="${a.capacidade ?? ''}"></div>
+          <div><label>Responsável (staff)</label><select id="ed-responsavel-${id}">${opcoesStaffHtml(a.staff_responsavel)}</select></div>
+        </div>
+        <div class="acoes-item" style="margin-top:10px;">
+          <button class="guardar" onclick="guardarAtividade('${id}')">Guardar</button>
+          <button onclick="renderAtividades()">Cancelar</button>
+        </div>
+      `;
+    }
+
+    async function guardarAtividade(id) {
+      const atualizado = {
+        nome: document.getElementById(`ed-nome-${id}`).value.trim(),
+        data: document.getElementById(`ed-data-${id}`).value || null,
+        local: document.getElementById(`ed-local-${id}`).value.trim() || null,
+        hora_inicio: document.getElementById(`ed-inicio-${id}`).value || null,
+        hora_fim: document.getElementById(`ed-fim-${id}`).value || null,
+        capacidade: document.getElementById(`ed-capacidade-${id}`).value ? Number(document.getElementById(`ed-capacidade-${id}`).value) : null,
+        staff_responsavel: document.getElementById(`ed-responsavel-${id}`).value.trim() || null,
+      };
+
+      const { error } = await supabaseClient.from('atividades').update(atualizado).eq('id', id);
+      if (error) {
+        console.error(error);
+        mostrarMensagem('msg-agenda', 'Erro ao guardar: ' + error.message, 'erro');
+        return;
+      }
+      mostrarMensagem('msg-agenda', 'Atividade atualizada!', 'sucesso');
+      await carregarAtividades();
+    }
+
+    async function apagarAtividade(id) {
+      if (!confirm('Apagar esta atividade? Não é possível desfazer.')) return;
+      const { error } = await supabaseClient.from('atividades').delete().eq('id', id);
+      if (error) {
+        console.error(error);
+        mostrarMensagem('msg-agenda', 'Erro ao apagar: ' + error.message, 'erro');
+        return;
+      }
+      mostrarMensagem('msg-agenda', 'Atividade apagada.', 'sucesso');
+      await carregarAtividades();
+    }
+
+    // ===================== TURNOS (REFEIÇÕES / COFFEE BREAKS) =====================
+
+    async function carregarTurnos() {
+      const { data, error } = await supabaseClient
+        .from('turnos_refeicao')
+        .select('id, nome, hora_inicio, hora_fim, local, staff_responsavel')
+        .order('hora_inicio', { ascending: true });
+
+      if (error) {
+        console.error('Erro ao ir buscar turnos:', error.message, error.details, error.hint);
+        mostrarMensagem('msg-turnos', 'Não foi possível carregar os turnos. Verifica as permissões (RLS) na Supabase.', 'erro');
+        return;
+      }
+      turnos = data ?? [];
+      renderTurnos();
+    }
+
+    async function criarTurno() {
+      const novo = {
+        nome: document.getElementById('novo-turno-nome').value.trim(),
+        hora_inicio: document.getElementById('novo-turno-inicio').value || null,
+        hora_fim: document.getElementById('novo-turno-fim').value || null,
+        local: document.getElementById('novo-turno-local').value.trim() || null,
+        staff_responsavel: document.getElementById('novo-turno-responsavel').value || null,
+      };
+
+      if (!novo.nome) {
+        mostrarMensagem('msg-turnos', 'Dá um nome ao turno.', 'erro');
+        return;
+      }
+
+      const { error } = await supabaseClient.from('turnos_refeicao').insert(novo);
+      if (error) {
+        console.error(error);
+        mostrarMensagem('msg-turnos', 'Erro ao criar: ' + error.message, 'erro');
+        return;
+      }
+
+      ['novo-turno-nome','novo-turno-inicio','novo-turno-fim','novo-turno-local','novo-turno-responsavel'].forEach(id => document.getElementById(id).value = '');
+      mostrarMensagem('msg-turnos', 'Turno criado!', 'sucesso');
+      await carregarTurnos();
+    }
+
+    function renderTurnos() {
+      const container = document.getElementById('lista-turnos');
+      const vazio = document.getElementById('turnos-vazio');
+      container.innerHTML = '';
+
+      if (turnos.length === 0) {
+        vazio.style.display = 'block';
+        return;
+      }
+      vazio.style.display = 'none';
+
+      turnos.forEach(t => {
+        const item = document.createElement('div');
+        item.className = 'item-registo';
+        item.dataset.id = t.id;
+
+        item.innerHTML = `
+          <div class="linha-topo">
+            <div>
+              <div class="nome">${t.nome}</div>
+              <div class="detalhe">
+                <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg> ${(t.hora_inicio ?? '--:--').slice(0,5)} – ${(t.hora_fim ?? '--:--').slice(0,5)} · <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.1 7-11.5A7 7 0 0 0 5 9.5C5 14.9 12 21 12 21Z"/><circle cx="12" cy="9.3" r="2.3"/></svg> ${t.local ?? 'Local a anunciar'}${t.staff_responsavel ? ' ·  ' + t.staff_responsavel : ''}
+              </div>
+            </div>
+            <div class="acoes-item">
+              <button onclick="editarTurno('${t.id}')">Editar</button>
+              <button class="apagar" onclick="apagarTurno('${t.id}')">Apagar</button>
+            </div>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function editarTurno(id) {
+      const t = turnos.find(x => x.id === id);
+      if (!t) return;
+      const item = document.querySelector(`#lista-turnos .item-registo[data-id="${id}"]`);
+
+      item.innerHTML = `
+        <div class="campos-grid">
+          <div class="campo-largo"><label>Nome</label><input type="text" id="edt-nome-${id}" value="${t.nome ?? ''}"></div>
+          <div><label>Hora início</label><input type="time" id="edt-inicio-${id}" value="${(t.hora_inicio ?? '').slice(0,5)}"></div>
+          <div><label>Hora fim</label><input type="time" id="edt-fim-${id}" value="${(t.hora_fim ?? '').slice(0,5)}"></div>
+          <div class="campo-largo"><label>Local</label><input type="text" id="edt-local-${id}" value="${t.local ?? ''}"></div>
+          <div class="campo-largo"><label>Responsável (staff)</label><select id="edt-responsavel-${id}">${opcoesStaffHtml(t.staff_responsavel)}</select></div>
+        </div>
+        <div class="acoes-item" style="margin-top:10px;">
+          <button class="guardar" onclick="guardarTurno('${id}')">Guardar</button>
+          <button onclick="renderTurnos()">Cancelar</button>
+        </div>
+      `;
+    }
+
+    async function guardarTurno(id) {
+      const atualizado = {
+        nome: document.getElementById(`edt-nome-${id}`).value.trim(),
+        hora_inicio: document.getElementById(`edt-inicio-${id}`).value || null,
+        hora_fim: document.getElementById(`edt-fim-${id}`).value || null,
+        local: document.getElementById(`edt-local-${id}`).value.trim() || null,
+        staff_responsavel: document.getElementById(`edt-responsavel-${id}`).value || null,
+      };
+
+      const { error } = await supabaseClient.from('turnos_refeicao').update(atualizado).eq('id', id);
+      if (error) {
+        console.error(error);
+        mostrarMensagem('msg-turnos', 'Erro ao guardar: ' + error.message, 'erro');
+        return;
+      }
+      mostrarMensagem('msg-turnos', 'Turno atualizado!', 'sucesso');
+      await carregarTurnos();
+    }
+
+    async function apagarTurno(id) {
+      if (!confirm('Apagar este turno? Não é possível desfazer.')) return;
+      const { error } = await supabaseClient.from('turnos_refeicao').delete().eq('id', id);
+      if (error) {
+        console.error(error);
+        mostrarMensagem('msg-turnos', 'Erro ao apagar: ' + error.message, 'erro');
+        return;
+      }
+      mostrarMensagem('msg-turnos', 'Turno apagado.', 'sucesso');
+      await carregarTurnos();
+    }
+
+    async function terminarSessaoLogistica() {
+      await supabaseClient.auth.signOut();
+      window.location.href = 'login.html';
+    }
+
+  </script>
+
+  <script src="jenc-ui.js"></script>
+
+</body>
+</html>

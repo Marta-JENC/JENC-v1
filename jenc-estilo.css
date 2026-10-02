@@ -1,0 +1,75 @@
+/* JENC — camada elegante e calma (carrega depois do CSS de cada página) */
+.fundo-foto{background-size:cover!important;background-repeat:no-repeat!important;background-position:center top!important}
+.fundo-veu{background:linear-gradient(180deg,rgba(12,35,64,.3),rgba(12,35,64,.62))!important}
+body{position:relative}
+body::after{content:"";position:absolute;top:34px;right:-12px;width:150px;height:150px;opacity:.5;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='none' stroke='%23BD8C1C' stroke-width='1'%3E%3Cpath d='M98 2C60 2 30 26 22 64'/%3E%3Cpath d='M98 14C70 14 48 30 40 56'/%3E%3Cpath d='M98 26C80 26 64 38 58 54'/%3E%3Cpath d='M22 64c-5 10 2 20 12 18'/%3E%3C/svg%3E") no-repeat}
+h1{font-weight:800!important;letter-spacing:-.025em}
+h1::after{content:"";display:block;width:34px;height:2px;background:#BD8C1C;border-radius:2px;margin-top:10px}
+.titulo-editorial::after,h1.titulo-forma::after{display:none}
+.voltar{background:none!important;border:0!important;padding:0!important;color:#93A6BF!important}
+.ico{width:1em;height:1em;vertical-align:-.15em;margin-right:.35em;color:#BD8C1C}
+.acoes-contacto .ico,.nav-staff .ico,.icone .ico{margin:0}
+.nav-staff .ico{width:18px;height:18px;color:#93A6BF}
+.acoes-contacto .ico{width:16px;height:16px;color:#E8C873}
+
+/* Linhas em vez de caixas */
+.card,.card-nav,.card-atividade,.card-pessoa,.card-turno,.card-momento,.card-desafio,.item-atividade,.item-turno,.item-contacto,.item-registo,.item-stock,.item-pendente,.item-local-sem-pin,.linha-leaderboard,.bloco-compra,.campo,.painel-detalhe,.caixa-acao{background:transparent!important;border:0!important;border-bottom:1px solid rgba(189,140,28,.18)!important;border-radius:0!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;margin-bottom:0!important}
+
+/* Destaques: vidro suave com fio dourado */
+.cartao-principal,.cartao-resumo,.cartao-progresso,.cartao-pontos,.bilhete-proxima{background:rgba(22,55,95,.3)!important;border:1px solid rgba(189,140,28,.3)!important;color:#F6F1E4!important;box-shadow:none!important;border-radius:20px!important;position:relative;overflow:hidden;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.cartao-principal::after,.cartao-resumo::after,.cartao-progresso::after,.cartao-pontos::after{content:"";position:absolute;right:-8px;bottom:-10px;width:110px;height:110px;opacity:.3;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='none' stroke='%23BD8C1C' stroke-width='1.2'%3E%3Cpath d='M98 98C60 98 30 74 22 36'/%3E%3Cpath d='M98 82C72 82 52 66 46 40'/%3E%3Cpath d='M98 66C80 66 64 54 58 42'/%3E%3C/svg%3E") no-repeat}
+.cartao-resumo .tag,.cartao-principal .tag,.cartao-progresso .tag,.cartao-pontos .tag{color:#E8C873!important;opacity:1!important}
+.cartao-resumo .legenda,.cartao-principal .linha{color:#F6F1E4!important;opacity:.85}
+.card-resumo-mini{background:transparent!important;border:0!important;border-top:1px solid rgba(189,140,28,.22)!important;border-radius:0!important;padding:14px 2px!important}
+.card-resumo-mini .numero{color:#F6F1E4!important}
+
+/* Essencial: grelha de fios finos */
+.tira-chips{display:grid!important;grid-template-columns:1fr 1fr;gap:0;overflow:visible!important;padding:0!important}
+.chip{background:transparent!important;border:0!important;border-bottom:1px solid rgba(189,140,28,.18)!important;border-radius:0!important;box-shadow:none!important;backdrop-filter:none!important;padding:16px 4px!important;min-width:0!important}
+.chip:nth-child(odd){border-right:1px solid rgba(189,140,28,.18)!important;padding-right:14px!important}
+.chip:nth-child(even){padding-left:18px!important}
+.chip svg{width:20px!important;height:20px!important;color:#BD8C1C!important}
+
+/* Atalhos (staff/logística) em lista */
+.grid-nav{display:block!important}
+.card-nav{display:grid!important;grid-template-columns:38px 1fr;column-gap:14px;align-items:center;padding:15px 2px!important}
+.card-nav .icone,.caixa-acao .icone,.card-momento .icone{grid-row:1/3;width:38px;height:38px;border-radius:50%;border:1px solid rgba(189,140,28,.5);color:#E8C873;display:grid!important;place-items:center;margin:0!important}
+.card-nav .titulo,.card-nav .descricao{grid-column:2}
+.icone .ico{width:19px;height:19px;color:#E8C873}
+
+/* Separadores sublinhados */
+.aba-dia,.aba-piso,.aba-vista,.aba-secao{background:none!important;border:0!important;border-bottom:2px solid transparent!important;border-radius:0!important;color:#93A6BF!important;padding:10px 4px!important;margin-right:10px}
+.aba-dia.ativa,.aba-piso.ativa,.aba-vista.ativa,.aba-secao.ativa{color:#E8C873!important;border-bottom-color:#BD8C1C!important}
+
+/* Campos e botões */
+input:not([type=checkbox]):not([type=radio]),select,textarea{background:rgba(12,35,64,.35)!important;border:1px solid rgba(189,140,28,.25)!important;border-radius:12px!important;color:#F6F1E4}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#BD8C1C!important}
+.botao-dourado,.botao-guardar,.botao-registar-mini,.botao-submeter,.botao-novo-momento,.botao-add-item,.entrada-manual button,.acoes-item button.guardar,.acoes-form button.guardar{background:linear-gradient(135deg,#C4931F,#E8C873)!important;color:#0C2340!important;border:0!important;border-radius:999px!important;font-weight:700}
+a,button{transition:opacity .2s}
+a:active,button:active{opacity:.65}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* Tema: Futuro sobre o Tejo (ondas do rio no fundo) */
+html::after{content:"";position:fixed;left:0;right:0;bottom:0;height:150px;z-index:-1;pointer-events:none;background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20480%20140%22%20preserveAspectRatio%3D%22none%22%20fill%3D%22none%22%20stroke%3D%22%23BD8C1C%22%20stroke-width%3D%221.2%22%3E%3Cpath%20opacity%3D%22.5%22%20d%3D%22M0%2090C60%2060%20120%20120%20180%2090S300%2060%20360%2090S450%20110%20480%2090%22/%3E%3Cpath%20opacity%3D%22.35%22%20d%3D%22M0%20110C70%2080%20130%20140%20200%20110S320%2080%20380%20110S460%20130%20480%20112%22/%3E%3Cpath%20opacity%3D%22.25%22%20d%3D%22M0%2070C50%2050%20110%2090%20170%2070S290%2050%20350%2070S440%2085%20480%2072%22/%3E%3C/svg%3E") bottom/100% 100% no-repeat}
+
+/* Barra de navegação: pílula branca com acento dourado */
+body #jenc-nav{left:50%!important;right:auto!important;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom,0px))!important;width:calc(100% - 28px);max-width:452px;border:0!important;border-radius:999px;background:rgba(246,241,228,.97)!important;box-shadow:0 10px 30px rgba(0,0,0,.4);padding:5px!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+body #jenc-nav a{color:#5d7089!important;border-radius:999px;padding:8px 2px 7px!important}
+body #jenc-nav a.ativo{color:#0C2340!important;background:rgba(189,140,28,.2)}
+body #jenc-nav a.ativo .ic{color:#BD8C1C}
+body #jenc-nav a.ativo::before{display:none!important}
+
+/* Gamificação: várias fotos */
+.tira-fotos{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.tira-fotos img{width:68px;height:68px;object-fit:cover;border-radius:12px;border:1px solid rgba(189,140,28,.3)}
+
+/* Compras: momentos bem distintos */
+.rotulo-dia{color:#E8C873!important;border-bottom:1px solid rgba(189,140,28,.4);padding-bottom:6px}
+.grelha-momentos{grid-template-columns:1fr!important;gap:10px!important}
+.grelha-momentos .card-momento{display:grid!important;grid-template-columns:40px 1fr;column-gap:14px;background:rgba(22,55,95,.32)!important;border:1px solid rgba(189,140,28,.22)!important;border-left:4px solid #BD8C1C!important;border-radius:14px!important;padding:14px 16px!important}
+.grelha-momentos .card-momento>*{grid-column:2}
+.grelha-momentos .card-momento .icone{grid-column:1;grid-row:1/4}
+.grelha-momentos .card-momento.refeicao{background:linear-gradient(90deg,rgba(189,140,28,.22),rgba(22,55,95,.32) 70%)!important;border-left-color:#E8C873!important}
+.grelha-momentos .card-momento.refeicao .icone{background:#BD8C1C;color:#0C2340;border-color:#BD8C1C}
+.grelha-momentos .card-momento.refeicao .icone .ico{color:#0C2340}
+.grelha-momentos .card-momento.coffee .titulo{color:#E8C873}

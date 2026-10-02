@@ -5,37 +5,39 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Contactos — JENC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="jenc-tema.css">
 <style>
   :root {
-    --bg: #0A1B2E;
-    --card: rgba(18, 40, 63, 0.82);
-    --accent: #D4A94A;
-    --text: #F4F0E4;
-    --muted: #7E97B0;
-    --border: #1F3B57;
-    --erro: #FF6B6B;
-    --sucesso: #7CD992;
+    --bg: #0C2340;
+    --card: rgba(22, 55, 95, 0.46);
+    --accent: #BD8C1C;
+    --text: #F6F1E4;
+    --muted: #93A6BF;
+    --border: rgba(189, 140, 28, 0.24);
+    --erro: #E8877A;
+    --sucesso: #8FCB9B;
   }
   * { box-sizing: border-box; }
   .fundo-foto {
     position: fixed; inset: 0; z-index: -2;
-    background-image: url("lisboa-simples.jpg");
-    background-size: cover;
-    background-position: center 55%;
+    background-image: url("jenc-fundo.png");
+    background-size: 640px auto;
+    background-position: top center;
+    background-repeat: repeat;
   }
   .fundo-veu {
     position: fixed; inset: 0; z-index: -1;
-    background: linear-gradient(180deg, rgba(10,27,46,0.55) 0%, rgba(10,27,46,0.72) 55%, rgba(10,27,46,0.88) 100%);
+    background: linear-gradient(180deg, rgba(12,35,64,0.55) 0%, rgba(12,35,64,0.72) 55%, rgba(12,35,64,0.88) 100%);
   }
   .card, [class*="card"], [class*="item-"], [class*="cartao"], [class*="aba"], .painel-detalhe, input {
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
   }
-  h1, h2 { font-family: 'Fraunces', Georgia, serif; font-weight: 600; letter-spacing: -0.01em; }
+  h1, h2 { font-family: 'Montserrat', sans-serif; font-weight: 700; letter-spacing: -0.015em; }
   body {
     margin: 0;
-    font-family: 'Manrope', 'Segoe UI', system-ui, sans-serif;
+    font-family: 'Montserrat', 'Segoe UI', system-ui, sans-serif;
     background: var(--bg);
     color: var(--text);
     padding: 20px 16px 90px;
@@ -56,7 +58,7 @@
     background: linear-gradient(135deg, var(--accent), #E8C873);
     border-radius: 14px;
     padding: 16px 18px;
-    color: #0A1B2E;
+    color: #0C2340;
     margin-bottom: 18px;
     display: flex;
     justify-content: space-between;
@@ -90,7 +92,7 @@
   }
   .entrada-manual button {
     padding: 12px 18px; border-radius: 10px; border: none;
-    background: var(--accent); color: #0A1B2E; font-weight: 600; cursor: pointer;
+    background: var(--accent); color: #0C2340; font-weight: 600; cursor: pointer;
   }
 
   .mensagem { font-size: 13px; text-align: center; margin-bottom: 16px; min-height: 18px; }
@@ -125,6 +127,7 @@
 
   .vazio, .estado { text-align: center; color: var(--muted); padding: 30px 0; font-size: 14px; }
 </style>
+<link rel="stylesheet" href="jenc-estilo.css">
 </head>
 <body>
   <div class="fundo-foto" aria-hidden="true"></div>
@@ -139,7 +142,9 @@
       <div class="tag">CONNECT & COLLECT</div>
       <div class="valor" id="progresso-contactos">0 / 5 contactos</div>
     </div>
-    <div id="badge-concluido" style="display:none; font-size:24px;">🏆</div>
+    <div id="badge-concluido" class="icone-circular" style="display:none; width:32px; height:32px; border-color:#0C2340; background:rgba(255,255,255,0.25); color:#0C2340;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v4a5 5 0 0 1-10 0V4Z"/><path d="M7 5H4.5A1.5 1.5 0 0 0 3 6.5C3 8.5 4.5 10 7 10"/><path d="M17 5h2.5A1.5 1.5 0 0 1 21 6.5C21 8.5 19.5 10 17 10"/><path d="M12 13v4M9 20.5h6M10 17h4v3.5h-4z"/></svg>
+    </div>
   </div>
 
   <div id="aviso-camara" class="aviso-camara"></div>
@@ -237,7 +242,7 @@
 
       document.getElementById('input-manual').value = '';
       mostrarMensagem(
-        pessoa.ja_existia ? `Já tinhas ${pessoa.nome} nos teus contactos.` : `${pessoa.nome} adicionado(a) aos teus contactos! 🎉`,
+        pessoa.ja_existia ? `Já tinhas ${pessoa.nome} nos teus contactos.` : `${pessoa.nome} adicionado(a) aos teus contactos! `,
         'sucesso'
       );
       renderPessoaEncontrada(pessoa);
@@ -275,8 +280,10 @@
       }
 
       const contactos = data ?? [];
-      document.getElementById('progresso-contactos').textContent = `${Math.min(contactos.length, 5)} / 5 contactos`;
-      document.getElementById('badge-concluido').style.display = contactos.length >= 5 ? 'inline-block' : 'none';
+      document.getElementById('progresso-contactos').textContent = contactos.length >= 5
+        ? `${contactos.length} contacto${contactos.length === 1 ? '' : 's'} — desafio completo`
+        : `${contactos.length} / 5 contactos`;
+      document.getElementById('badge-concluido').style.display = contactos.length >= 5 ? 'inline-flex' : 'none';
 
       container.innerHTML = '';
       if (contactos.length === 0) {
@@ -337,7 +344,7 @@
         estado: 'aprovado'
       });
 
-      mostrarMensagem(`🏆 Desafio "Connect & Collect" completo! +${desafio.pontos} pontos.`, 'sucesso');
+      mostrarMensagem(`Desafio "Connect & Collect" completo! +${desafio.pontos} pontos.`, 'sucesso');
     }
 
     function mostrarMensagem(texto, tipo) {
@@ -346,6 +353,8 @@
       el.className = 'mensagem' + (tipo ? ' ' + tipo : '');
     }
   </script>
+
+  <script src="jenc-ui.js"></script>
 
 </body>
 </html>

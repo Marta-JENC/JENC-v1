@@ -5,37 +5,39 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Stock — Staff JENC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="jenc-tema.css">
 <style>
   :root {
-    --bg: #0A1B2E;
-    --card: rgba(18, 40, 63, 0.82);
-    --accent: #D4A94A;
-    --text: #F4F0E4;
-    --muted: #7E97B0;
-    --border: #1F3B57;
-    --sucesso: #7CD992;
-    --erro: #FF6B6B;
+    --bg: #0C2340;
+    --card: rgba(22, 55, 95, 0.46);
+    --accent: #BD8C1C;
+    --text: #F6F1E4;
+    --muted: #93A6BF;
+    --border: rgba(189, 140, 28, 0.24);
+    --sucesso: #8FCB9B;
+    --erro: #E8877A;
   }
   * { box-sizing: border-box; }
   .fundo-foto {
     position: fixed; inset: 0; z-index: -2;
-    background-image: url("lisboa-simples.jpg");
-    background-size: cover;
-    background-position: center 55%;
+    background-image: url("jenc-fundo.png");
+    background-size: 640px auto;
+    background-position: top center;
+    background-repeat: repeat;
   }
   .fundo-veu {
     position: fixed; inset: 0; z-index: -1;
-    background: linear-gradient(180deg, rgba(10,27,46,0.55) 0%, rgba(10,27,46,0.72) 55%, rgba(10,27,46,0.88) 100%);
+    background: linear-gradient(180deg, rgba(12,35,64,0.55) 0%, rgba(12,35,64,0.72) 55%, rgba(12,35,64,0.88) 100%);
   }
   .card, [class*="card"], [class*="item-"], [class*="cartao"], [class*="aba"], .painel-detalhe, [class*="campo"], input, .rotulo-funcao {
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
   }
-  h1, h2 { font-family: 'Fraunces', Georgia, serif; font-weight: 600; letter-spacing: -0.01em; }
+  h1, h2 { font-family: 'Montserrat', sans-serif; font-weight: 700; letter-spacing: -0.015em; }
   body {
     margin: 0;
-    font-family: 'Manrope', 'Segoe UI', system-ui, sans-serif;
+    font-family: 'Montserrat', 'Segoe UI', system-ui, sans-serif;
     background: var(--bg);
     color: var(--text);
     padding: 20px 16px 90px;
@@ -70,7 +72,7 @@
   .linha-form input { flex: 1; }
   .botao-guardar {
     padding: 10px 16px; border: none; border-radius: 8px;
-    background: var(--accent); color: #0A1B2E; font-weight: 700; font-size: 13px; cursor: pointer;
+    background: var(--accent); color: #0C2340; font-weight: 700; font-size: 13px; cursor: pointer;
   }
   .botao-cancelar {
     padding: 10px 16px; border: 1px solid var(--border); border-radius: 8px;
@@ -100,7 +102,7 @@
     width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--border);
     background: var(--bg); color: var(--text); font-size: 12px; font-weight: 700; cursor: pointer;
   }
-  .controlos-item input[type="number"] {
+  .controlos-item input.campo-numero {
     width: 60px; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--border);
     background: var(--bg); color: var(--text); font-size: 13px; text-align: center;
   }
@@ -116,6 +118,7 @@
   .mensagem-topo { font-size: 12px; text-align: center; margin-bottom: 10px; min-height: 16px; }
   .mensagem-topo.erro { color: var(--erro); }
 </style>
+<link rel="stylesheet" href="jenc-estilo.css">
 </head>
 <body>
   <div class="fundo-foto" aria-hidden="true"></div>
@@ -127,7 +130,7 @@
       <p class="sub">Coffee breaks, almoço e jantar.</p>
     </div>
     <div class="nav-staff">
-      <a href="staff-inicio.html" title="Início">🏠</a>
+      <a href="staff-inicio.html" title="Início"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5 12 4l8 7.5M6 10v9a1 1 0 0 0 1 1h3v-6h4v6h3a1 1 0 0 0 1-1v-9"/></svg></a>
       <button onclick="terminarSessaoStaff()">Sair</button>
     </div>
   </header>
@@ -266,7 +269,7 @@
         partes.push(d.toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit' }));
       }
       if (m.hora_inicio) partes.push(`${m.hora_inicio.slice(0,5)}${m.hora_fim ? ' – ' + m.hora_fim.slice(0,5) : ''}`);
-      if (m.local) partes.push(`📍 ${m.local}`);
+      if (m.local) partes.push(`<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.1 7-11.5A7 7 0 0 0 5 9.5C5 14.9 12 21 12 21Z"/><circle cx="12" cy="9.3" r="2.3"/></svg> ${m.local}`);
       return partes.join(' · ');
     }
 
@@ -314,7 +317,7 @@
         formItem.id = `form-item-${m.id}`;
         formItem.innerHTML = `
           <input type="text" id="fi-nome-${m.id}" placeholder="Nome do item (ex: Café)">
-          <input type="number" id="fi-quantidade-${m.id}" placeholder="Quantidade inicial" min="0">
+          <input type="text" inputmode="numeric" id="fi-quantidade-${m.id}" placeholder="Quantidade inicial" min="0">
           <div class="linha-form">
             <button class="botao-guardar" onclick="criarItem('${m.id}')">Adicionar</button>
             <button class="botao-cancelar" onclick="alternarFormItem('${m.id}')">Cancelar</button>
@@ -348,14 +351,14 @@
           <button class="botao-passo" onclick="ajustarRestante('${item.id}', -25)">-25</button>
           <div class="separador"></div>
           <span class="rotulo-mini">restam:</span>
-          <input type="number" min="0" value="${item.quantidade_restante}" id="restante-${item.id}"
+          <input type="text" inputmode="numeric" class="campo-numero" min="0" value="${item.quantidade_restante}" id="restante-${item.id}"
                  onkeydown="if(event.key==='Enter') guardarRestante('${item.id}')">
           <button class="botao-passo" style="width:auto; padding:0 8px;" onclick="guardarRestante('${item.id}')">✓</button>
         </div>
         <div style="margin-top:6px;">
           <span class="rotulo-mini" style="cursor:pointer; text-decoration:underline;" onclick="alternarEditarInicial('${item.id}')">corrigir quantidade inicial</span>
           <span id="editar-inicial-${item.id}" style="display:none; margin-left:8px;">
-            <input type="number" min="0" value="${item.quantidade_inicial}" id="inicial-${item.id}" style="width:70px;"
+            <input type="text" inputmode="numeric" class="campo-numero" min="0" value="${item.quantidade_inicial}" id="inicial-${item.id}" style="width:70px;"
                    onkeydown="if(event.key==='Enter') guardarInicial('${item.id}')">
             <button class="botao-passo" style="width:auto; padding:0 8px;" onclick="guardarInicial('${item.id}')">✓</button>
           </span>
@@ -457,6 +460,8 @@
       window.location.href = 'login.html';
     }
   </script>
+
+  <script src="jenc-ui.js"></script>
 
 </body>
 </html>

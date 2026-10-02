@@ -5,153 +5,221 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>O Meu Evento — JENC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="jenc-tema.css">
 <style>
-  :root {
-    --bg: #0A1B2E;
-    --card: rgba(18, 40, 63, 0.82);
-    --accent: #D4A94A;
-    --text: #F4F0E4;
-    --muted: #7E97B0;
-    --border: #1F3B57;
-  }
-  * { box-sizing: border-box; }
-  .fundo-foto {
-    position: fixed; inset: 0; z-index: -2;
-    background-image: url("lisboa-simples.jpg");
-    background-size: cover;
-    background-position: center 55%;
-  }
-  .fundo-veu {
-    position: fixed; inset: 0; z-index: -1;
-    background: linear-gradient(180deg, rgba(10,27,46,0.55) 0%, rgba(10,27,46,0.72) 55%, rgba(10,27,46,0.88) 100%);
-  }
-  .card, [class*="card"], [class*="item-"], [class*="cartao"], [class*="aba"], .painel-detalhe, input {
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-  }
-  h1, h2 { font-family: 'Fraunces', Georgia, serif; font-weight: 600; letter-spacing: -0.01em; }
   body {
-    margin: 0;
-    font-family: 'Manrope', 'Segoe UI', system-ui, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    padding: 24px 16px 90px;
+    padding: 26px 18px 100px;
     max-width: 480px;
     margin-inline: auto;
   }
-  header h1 { font-size: 22px; font-weight: 600; margin: 0 0 4px; }
-  header p { margin: 0; color: var(--muted); font-size: 14px; }
-  .proxima-atividade {
-    margin-top: 24px;
-    background: linear-gradient(135deg, var(--accent), #E8C873);
-    border-radius: 16px;
-    padding: 20px;
-    color: #0A1B2E;
+
+  /* Cabeçalho: saudação editorial + 2 acessos rápidos (o resto já está na barra) */
+  .cabecalho-inicio {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
   }
-  .proxima-atividade .tag { font-size: 12px; font-weight: 600; opacity: 0.75; }
-  .proxima-atividade h2 { font-size: 20px; margin: 6px 0 10px; }
-  .proxima-atividade .linha {
-    font-size: 14px; display: flex; gap: 6px; align-items: center; margin-bottom: 4px;
+  .acoes-topo { display: flex; gap: 8px; flex-shrink: 0; margin-top: 2px; }
+
+  /* "Bilhete" da próxima atividade — moldura fina, não um bloco de gradiente */
+  .bilhete-proxima {
+    position: relative;
+    margin-top: 30px;
+    padding: 24px 22px;
+    border-radius: 18px;
+    background: var(--navy-glass);
+    border: 1px solid var(--hairline);
+    overflow: hidden;
   }
-  .proxima-atividade .countdown {
-    margin-top: 12px; font-size: 13px; font-weight: 600;
-    background: rgba(0,0,0,0.15); display: inline-block; padding: 4px 10px; border-radius: 999px;
+  .bilhete-proxima svg.ornamento {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 74px;
+    height: 74px;
+    color: var(--gold);
+    opacity: 0.35;
   }
-  section { margin-top: 28px; }
-  section h3 { font-size: 13px; color: var(--muted); margin: 0 0 10px; font-weight: 600; }
-  .card {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 12px; padding: 14px 16px; margin-bottom: 10px;
+  .bilhete-hora {
+    font-size: 34px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--gold-claro);
+    line-height: 1;
   }
-  .agenda-item { display: flex; gap: 14px; align-items: center; }
-  .agenda-item .hora { font-weight: 600; font-size: 14px; width: 48px; flex-shrink: 0; color: var(--accent); }
-  .agenda-item .info .nome { font-size: 14px; font-weight: 500; }
-  .agenda-item .info .local { font-size: 12px; color: var(--muted); }
-  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .mini-card .rotulo { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
-  .mini-card .valor { font-size: 15px; font-weight: 600; }
-  .estado { text-align: center; color: var(--muted); padding: 40px 0; font-size: 14px; }
-  .botao-secundario {
-    display: block;
-    text-align: center;
-    margin-top: 6px;
-    padding: 12px;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    color: var(--text);
-    text-decoration: none;
-    font-size: 13px;
+  .bilhete-proxima h2 {
+    font-size: 19px;
+    font-weight: 700;
+    margin: 10px 0 6px;
+    max-width: 88%;
+  }
+  .bilhete-local {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13.5px;
+    color: var(--mist);
+  }
+  .bilhete-local svg { width: 14px; height: 14px; flex-shrink: 0; }
+  .bilhete-rodape {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .pilula-contorno {
+    display: inline-block;
+    font-size: 12px;
     font-weight: 600;
+    color: var(--gold-claro);
+    border: 1px solid var(--hairline-forte);
+    padding: 5px 12px;
+    border-radius: 999px;
   }
+
+  section { margin-top: 32px; }
+
+  /* Agenda de hoje — linha do tempo, não cartões repetidos */
+  .linha-tempo { position: relative; padding-left: 20px; }
+  .linha-tempo::before {
+    content: '';
+    position: absolute;
+    left: 4px; top: 6px; bottom: 6px;
+    width: 1.5px;
+    background: linear-gradient(var(--hairline-forte), var(--hairline));
+  }
+  .item-tempo {
+    position: relative;
+    padding-bottom: 20px;
+    display: flex;
+    gap: 14px;
+    align-items: baseline;
+  }
+  .item-tempo:last-child { padding-bottom: 0; }
+  .item-tempo::before {
+    content: '';
+    position: absolute;
+    left: -20px;
+    top: 4px;
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: var(--navy);
+    border: 1.5px solid var(--gold);
+  }
+  .item-tempo .hora-tempo {
+    font-size: 13px; font-weight: 700; color: var(--gold-claro);
+    width: 42px; flex-shrink: 0;
+  }
+  .item-tempo .info-tempo .nome-tempo { font-size: 14.5px; font-weight: 600; color: var(--ivory); }
+  .item-tempo .info-tempo .local-tempo { font-size: 12px; color: var(--mist); margin-top: 2px; }
+  .item-tempo .info-tempo a.ver-mapa-tempo { font-size: 11.5px; color: var(--gold-claro); text-decoration: none; }
+
+  .ver-mais { display: block; margin-top: 16px; text-decoration: none; }
+
+  /* O essencial — fila de chips com scroll horizontal, gesto nativo de telemóvel */
+  .tira-chips {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 2px 2px 6px;
+    scrollbar-width: none;
+  }
+  .tira-chips::-webkit-scrollbar { display: none; }
+  .chip {
+    flex-shrink: 0;
+    min-width: 130px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: var(--navy-glass);
+    border: 1px solid var(--hairline);
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+  .chip svg { width: 17px; height: 17px; color: var(--gold); margin-bottom: 10px; }
+  .chip .rotulo-chip { font-size: 11px; color: var(--mist); margin-bottom: 3px; }
+  .chip .valor-chip { font-size: 14px; font-weight: 700; color: var(--ivory); }
+
+  .botao-sair-central { display: block; text-align: center; margin: 38px auto 0; }
+
+  .estado-carregamento { text-align: center; color: var(--mist); padding: 50px 0; font-size: 14px; }
 </style>
+<link rel="stylesheet" href="jenc-estilo.css">
 </head>
 <body>
-  <div class="fundo-foto" aria-hidden="true"></div>
-  <div class="fundo-veu" aria-hidden="true"></div>
+  <div class="fundo-jenc" aria-hidden="true"></div>
+  <div class="fundo-jenc-veu" aria-hidden="true"></div>
 
-  <header style="display:flex; justify-content:space-between; align-items:flex-start;">
+  <header class="cabecalho-inicio">
     <div>
-      <h1 id="saudacao">Olá 👋</h1>
-      <p id="subtitulo">A carregar o teu evento...</p>
+      <h1 id="saudacao" class="titulo-editorial">Olá</h1>
+      <div class="trico-dourado"></div>
+      <p id="subtitulo" class="texto-contexto" style="margin-top:10px;">A carregar o teu evento…</p>
     </div>
-    <div style="display:flex; gap:8px;">
-      <a href="mapa.html" style="background:none; border:1px solid var(--border); color:var(--muted); font-size:14px; padding:6px 10px; border-radius:8px; text-decoration:none;" title="Mapa">🗺️</a>
-      <a href="gamificacao.html" style="background:none; border:1px solid var(--border); color:var(--muted); font-size:14px; padding:6px 10px; border-radius:8px; text-decoration:none;" title="Gamificação">🏆</a>
-      <a href="qr-code.html" style="background:none; border:1px solid var(--border); color:var(--muted); font-size:14px; padding:6px 10px; border-radius:8px; text-decoration:none;" title="QR Code">▦</a>
-      <a href="contactos.html" style="background:none; border:1px solid var(--border); color:var(--muted); font-size:14px; padding:6px 10px; border-radius:8px; text-decoration:none;" title="Contactos">🤝</a>
-      <a href="perfil.html" style="background:none; border:1px solid var(--border); color:var(--muted); font-size:14px; padding:6px 10px; border-radius:8px; text-decoration:none;" title="Perfil">👤</a>
+    <div class="acoes-topo">
+      <a href="perfil.html" class="icone-circular" title="Perfil">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.3" r="3.3"/><path d="M5 20c.9-4 3.6-6.2 7-6.2s6.1 2.2 7 6.2"/></svg>
+      </a>
     </div>
   </header>
 
   <div id="conteudo" style="display:none;">
 
-    <div class="proxima-atividade" id="bloco-proxima-atividade">
-      <div class="tag">PRÓXIMA ATIVIDADE</div>
-      <h2 id="pa-nome">—</h2>
-      <div class="linha">📍 <span id="pa-local">—</span></div>
-      <div class="linha">🕐 <span id="pa-hora">—</span></div>
-      <div class="countdown" id="pa-countdown"></div>
-      <a href="#" id="pa-ver-mapa" style="display:none; margin-top:10px; font-size:12px; font-weight:700; color:#0A1B2E; text-decoration:underline;">Ver no mapa →</a>
+    <div class="bilhete-proxima" id="bloco-proxima-atividade">
+      <svg class="ornamento" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.1"><path d="M98 2C60 2 30 26 22 64"/><path d="M98 18C72 18 52 34 46 60"/><circle cx="98" cy="2" r="2.4" fill="currentColor" stroke="none"/></svg>
+      <div id="pa-rotulo" style="font-size:12px;font-weight:700;color:var(--gold-claro);margin-bottom:10px;">A seguir</div>
+      <div class="bilhete-hora" id="pa-hora-grande">—</div>
+      <h2 id="pa-nome">A carregar…</h2>
+      <div class="bilhete-local">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.1 7-11.5A7 7 0 0 0 5 9.5C5 14.9 12 21 12 21Z"/><circle cx="12" cy="9.3" r="2.3"/></svg>
+        <span id="pa-local">—</span>
+      </div>
+      <div class="bilhete-rodape">
+        <span class="pilula-contorno" id="pa-countdown"></span>
+        <a href="#" id="pa-ver-mapa" style="display:none; font-size:12.5px; font-weight:600; color:var(--gold-claro); text-decoration:none;">Ver no mapa →</a>
+      </div>
     </div>
 
     <section>
-      <h3>Agenda de hoje</h3>
-      <div id="lista-agenda"></div>
-      <a href="agenda.html" class="botao-secundario">Ver agenda completa →</a>
+      <div class="titulo-seccao" id="titulo-seguinte">A seguir</div>
+      <div class="linha-tempo" id="lista-agenda"></div>
+      <a href="agenda.html" class="ligacao-discreta ver-mais">Ver agenda completa →</a>
     </section>
 
     <section>
-      <h3>O essencial</h3>
-      <div class="grid2">
-        <a href="alojamento.html" class="card mini-card" style="text-decoration:none; color:inherit; display:block;">
-          <div class="rotulo">Alojamento</div>
-          <div class="valor" id="info-alojamento">—</div>
+      <div class="titulo-seccao">O essencial</div>
+      <div class="tira-chips">
+        <a href="alojamento.html" class="chip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v15M15 10h3a1 1 0 0 1 1 1v9M3 20h18M8.5 8h3M8.5 12h3M8.5 16h3"/></svg>
+          <div class="rotulo-chip">Alojamento</div>
+          <div class="valor-chip" id="info-alojamento">—</div>
         </a>
-        <div class="card mini-card">
-          <div class="rotulo">Quarto</div>
-          <div class="valor" id="info-quarto">—</div>
+        <div class="chip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="3.5"/><path d="m10.5 12.5 8-8M15.5 7.5l2.5 2.5M13 10l2 2"/></svg>
+          <div class="rotulo-chip">Quarto</div>
+          <div class="valor-chip" id="info-quarto">—</div>
         </div>
-        <a href="refeicoes.html" class="card mini-card" style="text-decoration:none; color:inherit; display:block;">
-          <div class="rotulo">Refeição</div>
-          <div class="valor" id="info-refeicao">—</div>
+        <a href="refeicoes.html" class="chip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3v7M9 3v7M7 10a2 2 0 0 1-2-2V3M9 10v11M17 3c-2 0-3 2-3 4.5S16 12 17 12v9"/></svg>
+          <div class="rotulo-chip">Refeição</div>
+          <div class="valor-chip" id="info-refeicao">—</div>
         </a>
-        <div class="card mini-card">
-          <div class="rotulo">Universidade</div>
-          <div class="valor" id="info-universidade">—</div>
+        <div class="chip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 8 12 4l9.5 4-9.5 4-9.5-4Z"/><path d="M6.5 10.2v4.3c0 1.4 2.5 2.5 5.5 2.5s5.5-1.1 5.5-2.5v-4.3"/></svg>
+          <div class="rotulo-chip">Universidade</div>
+          <div class="valor-chip" id="info-universidade">—</div>
         </div>
       </div>
     </section>
 
-    <button id="botao-sair" style="
-      width: 100%; margin-top: 12px; padding: 12px; border: none; border-radius: 10px;
-      background: transparent; border: 1px solid var(--border); color: var(--muted);
-      font-size: 13px; cursor: pointer;
-    ">Sair</button>
+    <button id="botao-sair" class="ligacao-discreta botao-sair-central" style="background:none;border:none;cursor:pointer;">Terminar sessão</button>
 
   </div>
 
-  <div id="estado-carregamento" class="estado">A carregar…</div>
+  <div id="estado-carregamento" class="estado-carregamento">A carregar…</div>
 
   <!-- 1. Carrega a biblioteca do Supabase (versão "script normal", sem módulos) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -161,11 +229,6 @@
   <!-- 3. A lógica desta página específica -->
   <script>
     init();
-
-    async function terminarSessao() {
-      await supabaseClient.auth.signOut();
-      window.location.href = 'login.html';
-    }
 
     async function init() {
       const user = await exigirSessao();
@@ -182,8 +245,7 @@
       renderEssencial(participante);
 
       const atividadesHoje = await getAtividadesDeHoje();
-      renderAgenda(atividadesHoje);
-      renderProximaAtividade(atividadesHoje);
+      renderInicioAgenda(atividadesHoje);
 
       document.getElementById('estado-carregamento').style.display = 'none';
       document.getElementById('conteudo').style.display = 'block';
@@ -197,8 +259,8 @@
     function renderSaudacao(p) {
       const hora = new Date().getHours();
       const cumprimento = hora < 12 ? 'Bom dia' : hora < 20 ? 'Boa tarde' : 'Boa noite';
-      document.getElementById('saudacao').textContent = `${cumprimento}, ${p.nome.split(' ')[0]} 👋`;
-      document.getElementById('subtitulo').textContent = 'Aqui tens o resumo do teu dia no JENC.';
+      document.getElementById('saudacao').textContent = `${cumprimento}, ${p.nome.split(' ')[0]}`;
+      document.getElementById('subtitulo').textContent = 'Futuro sobre o Tejo. Aqui tens o resumo do teu dia.';
     }
 
     function renderEssencial(p) {
@@ -224,67 +286,82 @@
       return data;
     }
 
-    function renderAgenda(atividades) {
-      const container = document.getElementById('lista-agenda');
-      container.innerHTML = '';
+    function renderInicioAgenda(atividades) {
+      const agora = new Date();
+      const ini = a => new Date(`${a.data}T${a.hora_inicio}`);
+      const fim = a => a.hora_fim ? new Date(`${a.data}T${a.hora_fim}`) : null;
 
-      if (atividades.length === 0) {
-        container.innerHTML = '<div class="card">Sem atividades agendadas para hoje.</div>';
-        return;
-      }
+      const atual = atividades.find(a => ini(a) <= agora && fim(a) && agora <= fim(a));
+      const seguinte = atividades.find(a => ini(a) > agora);
+      const destaque = atual ?? seguinte;
 
-      atividades.forEach(a => {
-        const item = document.createElement('div');
-        item.className = 'card agenda-item';
-        item.innerHTML = `
-          <div class="hora">${a.hora_inicio?.slice(0,5) ?? '--:--'}</div>
-          <div class="info">
-            <div class="nome">${a.nome}</div>
-            <div class="local">📍 ${a.local ?? 'Local a anunciar'}</div>
-            ${a.local_id ? `<a href="mapa.html?local=${a.local_id}" style="font-size:12px; color:var(--accent); text-decoration:none;">Ver no mapa →</a>` : ''}
-          </div>
-        `;
-        container.appendChild(item);
-      });
+      // Em baixo: só a atividade seguinte (ou, se nada está a decorrer, a que vem depois da destacada).
+      let extra = [];
+      if (atual && seguinte) extra = [seguinte];
+      else if (!atual && seguinte) extra = atividades.slice(atividades.indexOf(seguinte) + 1, atividades.indexOf(seguinte) + 2);
+
+      renderDestaque(destaque, !!atual, agora);
+      renderListaSeguinte(extra);
     }
 
-    function renderProximaAtividade(atividadesHoje) {
-      const agora = new Date();
+    function renderDestaque(a, aDecorrer, agora) {
+      const elCountdown = document.getElementById('pa-countdown');
+      const elLinkMapa = document.getElementById('pa-ver-mapa');
 
-      const proxima = atividadesHoje.find(a => {
-        const inicio = new Date(`${a.data}T${a.hora_inicio}`);
-        return inicio > agora;
-      });
-
-      const bloco = document.getElementById('bloco-proxima-atividade');
-
-      if (!proxima) {
-        bloco.innerHTML = '<div class="tag">SEM MAIS ATIVIDADES HOJE</div><h2>Até amanhã 👋</h2>';
+      if (!a) {
+        document.getElementById('pa-rotulo').textContent = 'Hoje';
+        document.getElementById('pa-hora-grande').textContent = '—';
+        document.getElementById('pa-nome').textContent = 'Até amanhã';
+        document.getElementById('pa-local').textContent = 'Sem mais atividades hoje';
+        elCountdown.style.display = 'none';
+        elLinkMapa.style.display = 'none';
         return;
       }
 
-      const inicio = new Date(`${proxima.data}T${proxima.hora_inicio}`);
-      const minutosRestantes = Math.round((inicio - agora) / 60000);
+      document.getElementById('pa-rotulo').textContent = aDecorrer ? 'A decorrer agora' : 'A seguir';
+      document.getElementById('pa-hora-grande').textContent = a.hora_inicio?.slice(0,5) ?? '--:--';
+      document.getElementById('pa-nome').textContent = a.nome;
+      document.getElementById('pa-local').textContent = a.local ?? 'Local a anunciar';
 
-      document.getElementById('pa-nome').textContent = proxima.nome;
-      document.getElementById('pa-local').textContent = proxima.local ?? 'Local a anunciar';
-      document.getElementById('pa-hora').textContent = proxima.hora_inicio?.slice(0,5);
-      document.getElementById('pa-countdown').textContent =
-        minutosRestantes <= 0
-          ? 'A começar agora'
-          : minutosRestantes < 60
-            ? `Começa dentro de ${minutosRestantes} min`
-            : `Começa às ${proxima.hora_inicio?.slice(0,5)}`;
+      const minutos = Math.round((new Date(`${a.data}T${a.hora_inicio}`) - agora) / 60000);
+      elCountdown.style.display = 'inline-block';
+      elCountdown.textContent = aDecorrer
+        ? (a.hora_fim ? `Até às ${a.hora_fim.slice(0,5)}` : 'A decorrer')
+        : minutos < 60 ? `Começa em ${Math.max(minutos, 1)} min` : `Começa às ${a.hora_inicio.slice(0,5)}`;
 
-      const elLinkMapa = document.getElementById('pa-ver-mapa');
-      if (proxima.local_id) {
-        elLinkMapa.href = `mapa.html?local=${proxima.local_id}`;
+      if (a.local_id) {
+        elLinkMapa.href = `mapa.html?local=${a.local_id}`;
         elLinkMapa.style.display = 'inline-block';
       } else {
         elLinkMapa.style.display = 'none';
       }
     }
+
+    function renderListaSeguinte(lista) {
+      const secao = document.getElementById('titulo-seguinte').parentElement;
+      const container = document.getElementById('lista-agenda');
+      container.innerHTML = '';
+      if (lista.length === 0) {
+        document.getElementById('titulo-seguinte').style.display = 'none';
+        container.style.display = 'none';
+        return;
+      }
+      lista.forEach(a => {
+        const item = document.createElement('div');
+        item.className = 'item-tempo';
+        item.innerHTML = `
+          <div class="hora-tempo">${a.hora_inicio?.slice(0,5) ?? '--:--'}</div>
+          <div class="info-tempo">
+            <div class="nome-tempo">${a.nome}</div>
+            <div class="local-tempo">${a.local ?? 'Local a anunciar'}</div>
+            ${a.local_id ? `<a href="mapa.html?local=${a.local_id}" class="ver-mapa-tempo">Ver no mapa →</a>` : ''}
+          </div>`;
+        container.appendChild(item);
+      });
+    }
   </script>
+
+  <script src="jenc-ui.js"></script>
 
 </body>
 </html>
